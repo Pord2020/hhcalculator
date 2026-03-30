@@ -387,8 +387,32 @@
           <span>Los contratos de <strong>44 horas</strong> corresponden al máximo legal y se calculan directamente por días.</span>
         </div>
 
-        <!-- ③ Ausencias / Horas -->
-        <div class="section-label">Ausencias y horas trabajadas</div>
+        <!-- ③ Desglose de horas trabajadas -->
+        <div class="section-label">Desglose de horas trabajadas</div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="semanasCompletas">Semanas completas</label>
+            <span class="hint">× horas de contrato c/u</span>
+            <input type="number" id="semanasCompletas" name="semanasCompletas"
+                   min="0" step="1" value="0" />
+          </div>
+          <div class="field">
+            <label for="diasSueltos">Días sueltos</label>
+            <span class="hint">Días adicionales trabajados</span>
+            <input type="number" id="diasSueltos" name="diasSueltos"
+                   min="0" step="1" value="0" />
+          </div>
+          <div class="field">
+            <label for="horasPorDia">Horas por día suelto</label>
+            <span class="hint">Default: tasa diaria del contrato</span>
+            <input type="number" id="horasPorDia" name="horasPorDia"
+                   min="0" step="0.5" placeholder="Auto" />
+          </div>
+        </div>
+        <div class="linked-hint" id="desglose-preview" style="margin-top:10px;color:var(--gray-500);font-size:.78rem"></div>
+
+        <!-- ③b Ausencias / Horas totales -->
+        <div class="section-label" style="margin-top:18px">Ausencias y horas trabajadas</div>
         <div class="grid-3">
           <div class="field">
             <label for="diasAusencia">Días de ausencia</label>
@@ -406,9 +430,9 @@
           </div>
           <div class="field">
             <label for="horasTrabajadas">Horas trabajadas</label>
-            <span class="hint">O ingresa semanas parciales sumadas</span>
+            <span class="hint">Se calcula del desglose o ingresa directo</span>
             <input type="number" id="horasTrabajadas" name="horasTrabajadas"
-                   min="0" step="0.5" placeholder="Ej: 86" class="linked" />
+                   min="0" step="0.5" placeholder="Ej: 80" class="linked" />
             <span class="field-error" id="err-trabajadas">No puede superar horas del período.</span>
           </div>
         </div>
@@ -637,6 +661,43 @@
   inpHorasAus.addEventListener('input',   () => { lastEdited = 'aus';  syncFromClean('aus');  });
   inpTrabajadas.addEventListener('input', () => { lastEdited = 'trab'; syncFromClean('trab'); });
 
+  // ── Desglose: semanas completas + días sueltos → horas trabajadas ──
+  const inpSemanasComp = document.getElementById('semanasCompletas');
+  const inpDiasSueltos = document.getElementById('diasSueltos');
+  const inpHorasPorDia = document.getElementById('horasPorDia');
+  const desglosePreview = document.getElementById('desglose-preview');
+
+  function calcDesglose() {
+    const b = getBase();
+    const semComp  = parseFloat(inpSemanasComp.value) || 0;
+    const diasSuel = parseFloat(inpDiasSueltos.value) || 0;
+    const hpd      = parseFloat(inpHorasPorDia.value) || (b ? b.hd : 0);
+    const contrato = parseFloat(inpContrato.value) || 0;
+
+    if (!semComp && !diasSuel) { desglosePreview.textContent = ''; return; }
+
+    const hrsSemanas = semComp * contrato;
+    const hrsDias    = diasSuel * hpd;
+    const total      = hrsSemanas + hrsDias;
+
+    const partes = [];
+    if (semComp)  partes.push(`${semComp} sem × ${fmt(contrato,0)} hrs = ${fmt(hrsSemanas,1)} hrs`);
+    if (diasSuel) partes.push(`${diasSuel} días × ${fmt(hpd,2)} hrs = ${fmt(hrsDias,1)} hrs`);
+    desglosePreview.innerHTML =
+      `<strong>Total:</strong> ${partes.join(' + ')} = <strong>${fmt(total,2)} hrs</strong>`;
+
+    // Volcar en horas trabajadas y disparar el sync
+    inpTrabajadas.value = parseFloat(total.toFixed(2));
+    lastEdited = 'trab';
+    syncFromClean('trab');
+  }
+
+  [inpSemanasComp, inpDiasSueltos, inpHorasPorDia].forEach(inp => {
+    inp.addEventListener('input', calcDesglose);
+  });
+  // Recalcular desglose si cambia el contrato
+  inpContrato.addEventListener('input', calcDesglose);
+
   function clearErrors() {
     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
     document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
@@ -648,6 +709,7 @@
     clearErrors();
     pillHM.textContent = '—';
     pillHD.textContent = '—';
+    desglosePreview.textContent = '';
     lastEdited = 'aus';
   });
 
