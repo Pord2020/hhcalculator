@@ -330,8 +330,17 @@
             <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" />
           </div>
           <div class="field">
-            <label for="periodo">Período</label>
-            <input type="text" id="periodo" name="periodo" placeholder="Ej: Marzo 2026" />
+            <label>Período</label>
+            <div style="display:flex;gap:8px;">
+              <select id="mes" name="mes" style="flex:1">
+                <option value="">Mes</option>
+                <option>Enero</option><option>Febrero</option><option>Marzo</option>
+                <option>Abril</option><option>Mayo</option><option>Junio</option>
+                <option>Julio</option><option>Agosto</option><option>Septiembre</option>
+                <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+              </select>
+              <select id="anio" name="anio" style="flex:1" id="anio"></select>
+            </div>
           </div>
         </div>
 
@@ -484,6 +493,46 @@
           <span class="r-unit"> días</span>
         </div>
       </div>
+
+      <div style="margin-top:16px;display:flex;justify-content:flex-end;">
+        <button type="button" id="btn-guardar" style="
+          background:var(--teal-600);color:#fff;border:none;
+          padding:10px 22px;border-radius:8px;font-size:.875rem;
+          font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;
+          transition:opacity .15s;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar análisis
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="card" id="card-historial" style="display:none">
+    <div class="card-header">
+      <h2>Historial de análisis</h2>
+      <button type="button" id="btn-limpiar-hist" style="
+        font-size:.72rem;font-weight:600;color:var(--red-600);
+        background:none;border:1px solid #fecaca;border-radius:6px;
+        padding:3px 10px;cursor:pointer;">
+        Limpiar todo
+      </button>
+    </div>
+    <div class="card-body" style="padding:0">
+      <table style="width:100%;border-collapse:collapse;font-size:.84rem">
+        <thead>
+          <tr style="background:var(--gray-50)">
+            <th style="padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Docente</th>
+            <th style="padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Período</th>
+            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Hrs contrato</th>
+            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Hrs trabajadas</th>
+            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">%</th>
+            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Días</th>
+            <th style="padding:9px 14px;border-bottom:1.5px solid var(--gray-200)"></th>
+          </tr>
+        </thead>
+        <tbody id="hist-body"></tbody>
+      </table>
     </div>
   </div>
 </main>
@@ -495,6 +544,19 @@
 </footer>
 
 <script>
+  // ── Poblar selector de año (2026 en adelante) ──
+  (function() {
+    const sel = document.getElementById('anio');
+    const cur = new Date().getFullYear();
+    const max = cur + 5;
+    for (let y = 2026; y <= max; y++) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      if (y === cur) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  })();
+
   const form           = document.getElementById('calc-form');
   const resultsEl      = document.getElementById('results');
   const alert44        = document.getElementById('alert-44');
@@ -600,7 +662,9 @@
     const horasAus     = parseFloat(inpHorasAus.value) || 0;
     const horasTrab    = parseFloat(inpTrabajadas.value);
     const nombre       = document.getElementById('nombre').value.trim();
-    const periodo      = document.getElementById('periodo').value.trim();
+    const mes          = document.getElementById('mes').value;
+    const anio         = document.getElementById('anio').value;
+    const periodo      = [mes, anio].filter(Boolean).join(' ');
 
     let valid = true;
     const hm = contrato * semanas;
@@ -665,9 +729,73 @@
       `${diasMes} días × ${fmt(porcentaje, 2)}%`;
     document.getElementById('result-days').textContent = fmt(diasTrabajados, 2);
 
+    // Guardar último resultado para el botón guardar
+    form._lastResult = { nombre, periodo, contrato, semanas, horasAus, horasTrab, porcentaje, diasTrabajados };
+
     resultsEl.classList.add('visible');
     resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+
+  // ── Historial (localStorage) ──
+  const HIST_KEY = 'hh_historial';
+
+  function getHistorial() {
+    try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveHistorial(data) {
+    localStorage.setItem(HIST_KEY, JSON.stringify(data));
+  }
+
+  function renderHistorial() {
+    const hist = getHistorial();
+    const card = document.getElementById('card-historial');
+    const tbody = document.getElementById('hist-body');
+    if (!hist.length) { card.style.display = 'none'; return; }
+    card.style.display = 'block';
+    tbody.innerHTML = hist.map((r, i) => `
+      <tr style="border-bottom:1px solid var(--gray-100)">
+        <td style="padding:10px 14px;font-weight:600">${r.nombre || '<span style="color:var(--gray-400)">—</span>'}</td>
+        <td style="padding:10px 14px;color:var(--gray-600)">${r.periodo || '—'}</td>
+        <td style="padding:10px 14px;text-align:right;font-variant-numeric:tabular-nums">${fmt(r.contrato,0)} × ${fmt(r.semanas,0)}<br><span style="font-size:.72rem;color:var(--gray-400)">${fmt(r.contrato * r.semanas, 0)} hrs</span></td>
+        <td style="padding:10px 14px;text-align:right;font-variant-numeric:tabular-nums">${fmt(r.horasTrab,2)} hrs</td>
+        <td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--blue-700)">${fmt(r.porcentaje,1)}%</td>
+        <td style="padding:10px 14px;text-align:right;font-weight:800;font-size:1rem;color:var(--blue-900)">${fmt(r.diasTrabajados,2)}</td>
+        <td style="padding:10px 14px;text-align:center">
+          <button onclick="eliminarEntrada(${i})" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:1rem" title="Eliminar">✕</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  window.eliminarEntrada = function(i) {
+    const hist = getHistorial();
+    hist.splice(i, 1);
+    saveHistorial(hist);
+    renderHistorial();
+  };
+
+  document.getElementById('btn-guardar').addEventListener('click', () => {
+    const r = form._lastResult;
+    if (!r) return;
+    const hist = getHistorial();
+    hist.unshift({ ...r, savedAt: new Date().toISOString() });
+    saveHistorial(hist);
+    renderHistorial();
+    const btn = document.getElementById('btn-guardar');
+    btn.textContent = '✓ Guardado';
+    btn.style.opacity = '.7';
+    setTimeout(() => { btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar análisis'; btn.style.opacity = '1'; }, 2000);
+  });
+
+  document.getElementById('btn-limpiar-hist').addEventListener('click', () => {
+    if (!confirm('¿Eliminar todo el historial?')) return;
+    saveHistorial([]);
+    renderHistorial();
+  });
+
+  // Cargar historial al iniciar
+  renderHistorial();
 </script>
 </body>
 </html>
