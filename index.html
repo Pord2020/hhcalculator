@@ -291,6 +291,36 @@
     .result-box .r-value { color: #fff; font-size: 2.5rem; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
     .result-box .r-unit  { color: #bfdbfe; font-size: .9rem; }
 
+    /* ── Semanas breakdown ── */
+    .semanas-table { width: 100%; border-collapse: collapse; font-size: .875rem; margin-bottom: 4px; }
+    .semanas-table th {
+      padding: 8px 12px; font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      color: var(--gray-400); border-bottom: 1.5px solid var(--gray-200);
+      text-align: center;
+    }
+    .semanas-table th:first-child { text-align: left; }
+    .semanas-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+    .semanas-table tr:last-child td { border-bottom: none; }
+    .semanas-table .sem-label { font-weight: 600; font-size: .8rem; color: var(--gray-600); white-space: nowrap; }
+    .semanas-table input[type="number"] {
+      width: 100%; padding: 7px 10px; border: 1.5px solid var(--gray-200);
+      border-radius: 7px; font-size: .875rem; color: var(--gray-800);
+      background: var(--gray-50); text-align: right;
+      appearance: textfield; -moz-appearance: textfield;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .semanas-table input[type="number"]::-webkit-outer-spin-button,
+    .semanas-table input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .semanas-table input:focus {
+      outline: none; border-color: var(--blue-400);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.12); background: var(--white);
+    }
+    .semanas-table input.linked-green { background: #f0fdf4; border-color: #86efac; }
+    .semanas-table input.linked-green:focus { border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+    .semanas-table .totals-row td { background: var(--gray-50); font-weight: 700; border-top: 1.5px solid var(--gray-200); border-bottom: none; padding-top: 10px; padding-bottom: 10px; }
+    .semanas-table .totals-row .total-val { font-size: .95rem; color: var(--blue-900); text-align: right; font-variant-numeric: tabular-nums; }
+
     /* ── Footer ── */
     footer {
       text-align: center;
@@ -327,7 +357,7 @@
         <div class="grid-2">
           <div class="field">
             <label for="nombre">Nombre del docente</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" />
+            <input type="text" id="nombre" name="nombre" placeholder="Nombre completo" />
           </div>
           <div class="field">
             <label>Período</label>
@@ -387,66 +417,43 @@
           <span>Los contratos de <strong>44 horas</strong> corresponden al máximo legal y se calculan directamente por días.</span>
         </div>
 
-        <!-- ③ Desglose de horas trabajadas -->
+        <!-- ③ Desglose semanal -->
         <div class="section-label">Desglose de horas trabajadas</div>
-        <div class="grid-3">
-          <div class="field">
-            <label for="semanasCompletas">Semanas completas</label>
-            <span class="hint">× horas de contrato c/u</span>
-            <input type="number" id="semanasCompletas" name="semanasCompletas"
-                   min="0" step="1" value="0" />
-          </div>
-          <div class="field">
-            <label for="diasSueltos">Días sueltos</label>
-            <span class="hint">Días adicionales trabajados</span>
-            <input type="number" id="diasSueltos" name="diasSueltos"
-                   min="0" step="1" value="0" />
-          </div>
-          <div class="field">
-            <label for="horasPorDia">Horas por día suelto</label>
-            <span class="hint">Default: tasa diaria del contrato</span>
-            <input type="number" id="horasPorDia" name="horasPorDia"
-                   min="0" step="0.5" placeholder="Auto" />
-          </div>
-        </div>
-        <div class="linked-hint" id="desglose-preview" style="margin-top:10px;color:var(--gray-500);font-size:.78rem"></div>
-
-        <!-- ③b Ausencias / Horas totales -->
-        <div class="section-label" style="margin-top:18px">Ausencias y horas trabajadas</div>
-        <div class="grid-3">
-          <div class="field">
-            <label for="diasAusencia">Días de ausencia</label>
-            <span class="hint">Se convierte a horas automáticamente</span>
-            <input type="number" id="diasAusencia" name="diasAusencia"
-                   min="0" step="0.5" value="0" />
-            <span class="field-error" id="err-diasaus">Valor no válido.</span>
-          </div>
-          <div class="field">
-            <label for="horasAusencia">Horas de ausencia</label>
-            <span class="hint">Licencia médica, permisos, etc.</span>
-            <input type="number" id="horasAusencia" name="horasAusencia"
-                   min="0" step="0.5" value="0" class="linked" />
-            <span class="field-error" id="err-ausencia">No puede superar horas del período.</span>
-          </div>
-          <div class="field">
-            <label for="horasTrabajadas">Horas trabajadas</label>
-            <span class="hint">Se calcula del desglose o ingresa directo</span>
-            <input type="number" id="horasTrabajadas" name="horasTrabajadas"
-                   min="0" step="0.5" placeholder="Ej: 80" class="linked" />
-            <span class="field-error" id="err-trabajadas">No puede superar horas del período.</span>
-          </div>
-        </div>
-        <div class="linked-hint">
+        <table class="semanas-table">
+          <thead>
+            <tr>
+              <th style="width:110px"></th>
+              <th>Hrs trabajadas</th>
+              <th>Hrs ausentes</th>
+            </tr>
+          </thead>
+          <tbody id="semanas-body">
+            <!-- generado por JS -->
+          </tbody>
+          <tfoot>
+            <tr class="totals-row">
+              <td class="sem-label">Total</td>
+              <td class="total-val" id="total-trabajadas">—</td>
+              <td class="total-val" id="total-ausencias">—</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="linked-hint" style="margin-top:6px">
           <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-          Los tres campos están vinculados — completá cualquiera y los otros se calculan solos.
+          Por fila: completá horas trabajadas o ausentes — la otra se calcula sola.
         </div>
+
+        <!-- Totales ocultos que alimentan el cálculo -->
+        <input type="hidden" id="horasAusencia" name="horasAusencia" value="0" />
+        <input type="hidden" id="horasTrabajadas" name="horasTrabajadas" value="0" />
+        <span class="field-error" id="err-ausencia" style="display:none"></span>
+        <span class="field-error" id="err-trabajadas" style="display:none"></span>
 
         <!-- ④ Configuración -->
         <div class="section-label">Configuración del período</div>
         <div class="grid-2">
           <div class="field">
             <label for="diasMes">Días del mes</label>
-            <span class="hint">Convención laboral chilena (normalmente 30)</span>
             <input type="number" id="diasMes" name="diasMes"
                    min="1" max="31" step="1" value="30" required />
             <span class="field-error" id="err-diasmes">Valor entre 1 y 31.</span>
@@ -619,84 +626,89 @@
     }
   }
 
-  let lastEdited = 'aus';
+  // ── Tabla semanal ──
+  const NUM_SEMANAS = 4;
+  const tbody = document.getElementById('semanas-body');
+  const hiddenAus  = document.getElementById('horasAusencia');
+  const hiddenTrab = document.getElementById('horasTrabajadas');
 
-  function syncFromClean(source) {
-    const b = getBase();
-    if (!b) return;
-    const { hm, hd } = b;
-
-    if (source === 'dias') {
-      const dias = parseFloat(inpDiasAus.value);
-      if (!isNaN(dias)) {
-        const hAus = dias * hd;
-        inpHorasAus.value   = parseFloat(Math.min(hAus, hm).toFixed(2));
-        inpTrabajadas.value = parseFloat(Math.max(0, hm - hAus).toFixed(2));
-      }
-    } else if (source === 'aus') {
-      const hAus = parseFloat(inpHorasAus.value);
-      if (!isNaN(hAus)) {
-        inpTrabajadas.value = parseFloat(Math.max(0, hm - hAus).toFixed(2));
-        if (hd > 0) inpDiasAus.value = parseFloat((hAus / hd).toFixed(2));
-      }
-    } else if (source === 'trab') {
-      const hTrab = parseFloat(inpTrabajadas.value);
-      if (!isNaN(hTrab)) {
-        const hAus = Math.max(0, hm - hTrab);
-        inpHorasAus.value  = parseFloat(hAus.toFixed(2));
-        if (hd > 0) inpDiasAus.value = parseFloat((hAus / hd).toFixed(2));
-      }
+  function buildSemanasTable() {
+    tbody.innerHTML = '';
+    for (let i = 1; i <= NUM_SEMANAS; i++) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="sem-label">Semana ${i}</td>
+        <td><input type="number" class="inp-trab" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>
+        <td><input type="number" class="inp-aus  linked-green" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>`;
+      tbody.appendChild(tr);
     }
+    attachSemanasListeners();
   }
 
-  [inpContrato, inpDiasLab, inpSemanas].forEach(inp => {
+  function getContratoVal() { return parseFloat(inpContrato.value) || 0; }
+
+  function updateTotals() {
+    const trabInputs = tbody.querySelectorAll('.inp-trab');
+    const ausInputs  = tbody.querySelectorAll('.inp-aus');
+    let totalTrab = 0, totalAus = 0;
+    trabInputs.forEach(inp => { totalTrab += parseFloat(inp.value) || 0; });
+    ausInputs.forEach(inp  => { totalAus  += parseFloat(inp.value)  || 0; });
+    document.getElementById('total-trabajadas').textContent = fmt(totalTrab, 2) + ' hrs';
+    document.getElementById('total-ausencias').textContent  = fmt(totalAus,  2) + ' hrs';
+    hiddenTrab.value = parseFloat(totalTrab.toFixed(2));
+    hiddenAus.value  = parseFloat(totalAus.toFixed(2));
+  }
+
+  function attachSemanasListeners() {
+    tbody.querySelectorAll('.inp-trab').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const contrato = getContratoVal();
+        const sem = inp.dataset.sem;
+        const ausInp = tbody.querySelector(`.inp-aus[data-sem="${sem}"]`);
+        const trab = parseFloat(inp.value);
+        if (!isNaN(trab) && contrato > 0) {
+          ausInp.value = parseFloat(Math.max(0, contrato - trab).toFixed(2));
+        }
+        updateTotals();
+      });
+    });
+    tbody.querySelectorAll('.inp-aus').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const contrato = getContratoVal();
+        const sem = inp.dataset.sem;
+        const trabInp = tbody.querySelector(`.inp-trab[data-sem="${sem}"]`);
+        const aus = parseFloat(inp.value);
+        if (!isNaN(aus) && contrato > 0) {
+          trabInp.value = parseFloat(Math.max(0, contrato - aus).toFixed(2));
+        }
+        updateTotals();
+      });
+    });
+  }
+
+  // Recalcular ausencias cuando cambia el contrato (manteniendo trabajadas)
+  inpContrato.addEventListener('input', () => {
+    updatePills();
+    alert44.classList.toggle('visible', Number(inpContrato.value) === 44);
+    const contrato = getContratoVal();
+    tbody.querySelectorAll('.inp-trab').forEach(inp => {
+      const trab = parseFloat(inp.value);
+      if (!isNaN(trab) && contrato > 0) {
+        const sem = inp.dataset.sem;
+        const ausInp = tbody.querySelector(`.inp-aus[data-sem="${sem}"]`);
+        ausInp.value = parseFloat(Math.max(0, contrato - trab).toFixed(2));
+      }
+    });
+    updateTotals();
+  });
+
+  [inpDiasLab, inpSemanas].forEach(inp => {
     inp.addEventListener('input', () => {
       updatePills();
-      alert44.classList.toggle('visible', Number(inpContrato.value) === 44);
-      syncFromClean(lastEdited);
     });
   });
 
-  inpDiasAus.addEventListener('input',    () => { lastEdited = 'dias'; syncFromClean('dias'); });
-  inpHorasAus.addEventListener('input',   () => { lastEdited = 'aus';  syncFromClean('aus');  });
-  inpTrabajadas.addEventListener('input', () => { lastEdited = 'trab'; syncFromClean('trab'); });
-
-  // ── Desglose: semanas completas + días sueltos → horas trabajadas ──
-  const inpSemanasComp = document.getElementById('semanasCompletas');
-  const inpDiasSueltos = document.getElementById('diasSueltos');
-  const inpHorasPorDia = document.getElementById('horasPorDia');
-  const desglosePreview = document.getElementById('desglose-preview');
-
-  function calcDesglose() {
-    const b = getBase();
-    const semComp  = parseFloat(inpSemanasComp.value) || 0;
-    const diasSuel = parseFloat(inpDiasSueltos.value) || 0;
-    const hpd      = parseFloat(inpHorasPorDia.value) || (b ? b.hd : 0);
-    const contrato = parseFloat(inpContrato.value) || 0;
-
-    if (!semComp && !diasSuel) { desglosePreview.textContent = ''; return; }
-
-    const hrsSemanas = semComp * contrato;
-    const hrsDias    = diasSuel * hpd;
-    const total      = hrsSemanas + hrsDias;
-
-    const partes = [];
-    if (semComp)  partes.push(`${semComp} sem × ${fmt(contrato,0)} hrs = ${fmt(hrsSemanas,1)} hrs`);
-    if (diasSuel) partes.push(`${diasSuel} días × ${fmt(hpd,2)} hrs = ${fmt(hrsDias,1)} hrs`);
-    desglosePreview.innerHTML =
-      `<strong>Total:</strong> ${partes.join(' + ')} = <strong>${fmt(total,2)} hrs</strong>`;
-
-    // Volcar en horas trabajadas y disparar el sync
-    inpTrabajadas.value = parseFloat(total.toFixed(2));
-    lastEdited = 'trab';
-    syncFromClean('trab');
-  }
-
-  [inpSemanasComp, inpDiasSueltos, inpHorasPorDia].forEach(inp => {
-    inp.addEventListener('input', calcDesglose);
-  });
-  // Recalcular desglose si cambia el contrato
-  inpContrato.addEventListener('input', calcDesglose);
+  buildSemanasTable();
 
   function clearErrors() {
     document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
@@ -709,24 +721,24 @@
     clearErrors();
     pillHM.textContent = '—';
     pillHD.textContent = '—';
-    desglosePreview.textContent = '';
-    lastEdited = 'aus';
+    buildSemanasTable();
+    updateTotals();
   });
 
   form.addEventListener('submit', e => {
     e.preventDefault();
     clearErrors();
 
-    const contrato     = parseFloat(inpContrato.value);
-    const diasLab      = parseFloat(inpDiasLab.value);
-    const semanas      = parseFloat(inpSemanas.value);
-    const diasMes      = parseFloat(document.getElementById('diasMes').value);
-    const horasAus     = parseFloat(inpHorasAus.value) || 0;
-    const horasTrab    = parseFloat(inpTrabajadas.value);
-    const nombre       = document.getElementById('nombre').value.trim();
-    const mes          = document.getElementById('mes').value;
-    const anio         = document.getElementById('anio').value;
-    const periodo      = [mes, anio].filter(Boolean).join(' ');
+    const contrato  = parseFloat(inpContrato.value);
+    const diasLab   = parseFloat(inpDiasLab.value);
+    const semanas   = parseFloat(inpSemanas.value);
+    const diasMes   = parseFloat(document.getElementById('diasMes').value);
+    const horasAus  = parseFloat(hiddenAus.value)  || 0;
+    const horasTrab = parseFloat(hiddenTrab.value) || 0;
+    const nombre    = document.getElementById('nombre').value.trim();
+    const mes       = document.getElementById('mes').value;
+    const anio      = document.getElementById('anio').value;
+    const periodo   = [mes, anio].filter(Boolean).join(' ');
 
     let valid = true;
     const hm = contrato * semanas;
@@ -747,15 +759,10 @@
       document.getElementById('err-diasmes').classList.add('visible');
       document.getElementById('diasMes').classList.add('error'); valid = false;
     }
-    if (isNaN(horasTrab) || horasTrab < 0 || horasTrab > hm) {
-      document.getElementById('err-trabajadas').classList.add('visible');
-      inpTrabajadas.classList.add('error'); valid = false;
-    }
     if (!valid) return;
 
     const horasMensuales = hm;
-    const horasDiarias   = contrato / diasLab;
-    const porcentaje     = (horasTrab / horasMensuales) * 100;
+    const porcentaje     = horasMensuales > 0 ? (horasTrab / horasMensuales) * 100 : 0;
     const diasTrabajados = diasMes * (porcentaje / 100);
 
     const metaEl = document.getElementById('result-meta');
@@ -775,10 +782,7 @@
     document.getElementById('f1').textContent = `${contrato} × ${semanas}`;
     document.getElementById('v1').textContent = `${fmt(horasMensuales, 1)} hrs`;
 
-    document.getElementById('f2').textContent =
-      parseFloat(inpDiasAus.value) > 0
-        ? `${fmt(parseFloat(inpDiasAus.value), 2)} días × ${fmt(horasDiarias, 2)} hrs/día`
-        : 'ingreso directo';
+    document.getElementById('f2').textContent = 'desglose semanal';
     document.getElementById('v2').textContent = `${fmt(horasAus, 2)} hrs`;
 
     document.getElementById('f3').textContent = `${fmt(horasMensuales, 1)} − ${fmt(horasAus, 2)}`;
