@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Horas Trabajadas</title>
+  <title>Calculadora HH — Sistema de Remuneraciones</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -25,8 +25,14 @@
       --amber-600: #d97706;
       --amber-50:  #fffbeb;
       --red-600:   #dc2626;
+      --red-50:    #fef2f2;
+      --green-600: #16a34a;
+      --green-50:  #f0fdf4;
+      --green-100: #dcfce7;
       --teal-600:  #0d9488;
       --teal-50:   #f0fdfa;
+      --purple-600:#7c3aed;
+      --purple-50: #f5f3ff;
       --radius: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
     }
@@ -36,40 +42,134 @@
       background: var(--gray-100);
       color: var(--gray-800);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      position: fixed; inset: 0;
+      background: var(--blue-900);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .login-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 40px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .login-logo {
+      width: 52px; height: 52px;
+      background: var(--blue-500);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+    .login-logo svg { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .login-box h2 { text-align: center; font-size: 1.2rem; font-weight: 700; color: var(--blue-900); margin-bottom: 4px; }
+    .login-box p  { text-align: center; font-size: .8rem; color: var(--gray-500); margin-bottom: 24px; }
+    .login-field  { margin-bottom: 14px; }
+    .login-field label { display: block; font-size: .75rem; font-weight: 600; color: var(--gray-600); margin-bottom: 5px; }
+    .login-field input {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .login-field input:focus { border-color: var(--blue-400); }
+    #login-error { color: var(--red-600); font-size: .78rem; margin-bottom: 10px; display: none; }
+    .btn-login {
+      width: 100%; padding: 11px;
+      background: var(--blue-500); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: .9rem; font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-login:hover { background: var(--blue-700); }
+    .login-hint { text-align: center; font-size: .72rem; color: var(--gray-400); margin-top: 14px; }
+
+    /* ── APP ── */
+    #app { display: none; flex-direction: column; min-height: 100vh; }
+    #app.visible { display: flex; }
 
     /* ── Header ── */
     header {
       background: var(--blue-900);
       color: var(--white);
-      padding: 24px 40px;
+      padding: 14px 32px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .header-icon {
-      width: 42px; height: 42px;
+      width: 38px; height: 38px;
       background: var(--blue-500);
-      border-radius: 10px;
+      border-radius: 9px;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .header-icon svg { width: 22px; height: 22px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
-    header p  { font-size: .8rem; color: #93c5fd; margin-top: 2px; }
+    .header-icon svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .header-title { flex: 1; }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    header p  { font-size: .75rem; color: #93c5fd; margin-top: 1px; }
+    .header-user {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .8rem; color: #93c5fd;
+    }
+    .user-avatar {
+      width: 30px; height: 30px;
+      background: var(--blue-500);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700; color: #fff;
+    }
+    .btn-logout {
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: .75rem;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.2); }
 
-    /* ── Main ── */
+    /* ── Nav Tabs ── */
+    .nav-tabs {
+      background: var(--blue-700);
+      padding: 0 32px;
+      display: flex;
+      gap: 0;
+    }
+    .nav-tab {
+      padding: 12px 20px;
+      color: #93c5fd;
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color .15s, border-color .15s;
+      user-select: none;
+    }
+    .nav-tab:hover { color: #fff; }
+    .nav-tab.active { color: #fff; border-bottom-color: var(--blue-400); }
+
+    /* ── Content ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
     main {
-      flex: 1;
-      max-width: 800px;
+      max-width: 840px;
       width: 100%;
-      margin: 32px auto;
+      margin: 28px auto;
       padding: 0 20px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
     /* ── Card ── */
@@ -81,7 +181,7 @@
       overflow: hidden;
     }
     .card-header {
-      padding: 14px 20px;
+      padding: 13px 20px;
       border-bottom: 1px solid var(--gray-200);
       display: flex;
       align-items: center;
@@ -89,774 +189,1209 @@
       background: var(--gray-50);
     }
     .card-header h2 {
-      font-size: .875rem;
+      font-size: .85rem;
       font-weight: 700;
       color: var(--blue-900);
-      letter-spacing: -.01em;
       flex: 1;
     }
     .badge {
-      font-size: .68rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 99px;
-      white-space: nowrap;
+      font-size: .68rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
     }
-    .badge-blue  { background: var(--blue-50);  color: var(--blue-500);  border: 1px solid var(--blue-100); }
-    .badge-gray  { background: var(--gray-100); color: var(--gray-500);  border: 1px solid var(--gray-200); }
-    .badge-teal  { background: var(--teal-50);  color: var(--teal-600);  border: 1px solid #99f6e4; }
+    .badge-blue   { background: var(--blue-100); color: var(--blue-700); }
+    .badge-green  { background: var(--green-100); color: var(--green-600); }
+    .badge-amber  { background: var(--amber-50); color: var(--amber-600); }
     .card-body { padding: 20px; }
 
-    /* ── Section dividers inside card ── */
-    .section-label {
-      font-size: .7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: var(--gray-400);
-      margin-bottom: 14px;
-      margin-top: 22px;
-      padding-bottom: 6px;
-      border-bottom: 1px dashed var(--gray-200);
-    }
-    .section-label:first-child { margin-top: 0; }
-
-    /* ── Grid ── */
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-    @media (max-width: 560px) {
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    }
-
-    /* ── Fields ── */
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field label {
-      font-size: .75rem;
-      font-weight: 700;
-      color: var(--gray-600);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-    }
-    .field .hint { font-size: .72rem; color: var(--gray-400); }
-
-    .field input[type="text"],
-    .field input[type="number"],
-    .field select {
-      padding: 9px 12px;
+    /* ── Form grid ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: .75rem; font-weight: 600; color: var(--gray-600); }
+    input[type="number"], input[type="text"], select {
+      width: 100%; padding: 9px 12px;
       border: 1.5px solid var(--gray-200);
       border-radius: 8px;
-      font-size: .9rem;
+      font-size: .88rem;
       color: var(--gray-800);
-      background: var(--gray-50);
-      transition: border-color .15s, box-shadow .15s;
-      width: 100%;
-    }
-    .field input[type="number"] {
-      appearance: textfield;
-      -moz-appearance: textfield;
-    }
-    .field input[type="number"]::-webkit-outer-spin-button,
-    .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .field input:focus, .field select:focus {
+      background: #fff;
       outline: none;
-      border-color: var(--blue-400);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
-      background: var(--white);
+      transition: border-color .15s, box-shadow .15s;
     }
-    .field input.error  { border-color: var(--red-600) !important; }
-    .field input.linked { background: #f0fdf4; border-color: #86efac; }
-    .field input.linked:focus { border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
+    input:focus, select:focus {
+      border-color: var(--blue-400);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+    input.linked-green { border-color: #a7f3d0; background: #f0fdf4; }
+    input.linked-green:focus { border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.08); }
+    .field-hint { font-size: .7rem; color: var(--gray-400); }
 
-    .field-error { font-size: .72rem; color: var(--red-600); display: none; }
-    .field-error.visible { display: block; }
-
-    /* ── Info pill (live display) ── */
+    /* ── Info pill ── */
     .info-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
+      display: flex; align-items: center; gap: 8px;
       background: var(--blue-50);
       border: 1px solid var(--blue-100);
       border-radius: 8px;
-      padding: 10px 16px;
-      margin-top: 14px;
-      font-size: .8rem;
+      padding: 9px 14px;
+      font-size: .78rem;
       color: var(--blue-700);
-      flex-wrap: wrap;
     }
-    .info-pill .pill-item { display: flex; flex-direction: column; gap: 1px; }
-    .info-pill .pill-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--blue-400); }
-    .info-pill .pill-value { font-weight: 700; font-size: .9rem; color: var(--blue-900); }
+    .info-pill svg { width: 15px; height: 15px; flex-shrink: 0; stroke: var(--blue-500); fill: none; stroke-width: 2; stroke-linecap: round; }
 
-    /* ── Linked hint ── */
-    .linked-hint {
-      font-size: .72rem;
-      color: var(--teal-600);
-      margin-top: 6px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .linked-hint svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
-
-    /* ── Alert ── */
-    .alert {
-      display: none;
-      padding: 11px 14px;
-      border-radius: 8px;
-      font-size: .8rem;
-      gap: 9px;
-      align-items: flex-start;
-      margin-top: 14px;
-    }
-    .alert.visible { display: flex; }
-    .alert-warning { background: var(--amber-50); color: var(--amber-600); border: 1px solid #fde68a; }
-    .alert svg { width: 15px; height: 15px; flex-shrink: 0; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-    /* ── Buttons ── */
-    .btn-row { margin-top: 20px; display: flex; gap: 10px; align-items: center; }
-    button[type="submit"] {
-      background: var(--blue-500);
-      color: #fff;
-      border: none;
-      padding: 10px 26px;
-      border-radius: 8px;
-      font-size: .875rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .15s, transform .1s;
-    }
-    button[type="submit"]:hover  { background: var(--blue-700); }
-    button[type="submit"]:active { transform: scale(.98); }
-    button[type="reset"] {
-      background: transparent;
-      color: var(--gray-600);
-      border: 1.5px solid var(--gray-200);
-      padding: 9px 18px;
-      border-radius: 8px;
-      font-size: .825rem;
-      cursor: pointer;
-      font-weight: 500;
-      transition: border-color .15s, color .15s;
-    }
-    button[type="reset"]:hover { border-color: var(--gray-400); color: var(--gray-800); }
-
-    /* ── Results ── */
-    #results { display: none; }
-    #results.visible { display: block; }
-
-    .result-meta {
-      font-size: .8rem;
+    /* ── Semanas table ── */
+    .semanas-table { width: 100%; border-collapse: collapse; }
+    .semanas-table th {
+      font-size: .72rem; font-weight: 700;
       color: var(--gray-500);
-      margin-bottom: 16px;
-      padding-bottom: 14px;
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--gray-200);
+      text-align: left;
+    }
+    .semanas-table td {
+      padding: 5px 10px;
       border-bottom: 1px solid var(--gray-100);
     }
-    .result-meta strong { color: var(--gray-800); }
-
-    .steps-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    .steps-table th {
-      text-align: left;
-      padding: 8px 12px;
-      font-size: .68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      color: var(--gray-400);
-      border-bottom: 1.5px solid var(--gray-200);
-    }
-    .steps-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); }
-    .steps-table tr:last-child td { border-bottom: none; }
-    .steps-table .step-num {
-      font-size: .68rem; font-weight: 700;
-      background: var(--blue-50); color: var(--blue-500);
-      padding: 2px 6px; border-radius: 99px;
-      border: 1px solid var(--blue-100);
-    }
-    .steps-table .formula { color: var(--gray-400); font-style: italic; font-size: .78rem; }
-    .steps-table .val { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-
-    .result-box {
-      margin-top: 18px;
-      background: var(--blue-900);
-      border-radius: 10px;
-      padding: 22px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .result-box .r-label { color: #93c5fd; font-size: .8rem; font-weight: 500; }
-    .result-box .r-sub   { color: #bfdbfe; font-size: .75rem; margin-top: 3px; }
-    .result-box .r-value { color: #fff; font-size: 2.5rem; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
-    .result-box .r-unit  { color: #bfdbfe; font-size: .9rem; }
-
-    /* ── Semanas breakdown ── */
-    .semanas-table { width: 100%; border-collapse: collapse; font-size: .875rem; margin-bottom: 4px; }
-    .semanas-table th {
-      padding: 8px 12px; font-size: .68rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .05em;
-      color: var(--gray-400); border-bottom: 1.5px solid var(--gray-200);
-      text-align: center;
-    }
-    .semanas-table th:first-child { text-align: left; }
-    .semanas-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
     .semanas-table tr:last-child td { border-bottom: none; }
-    .semanas-table .sem-label { font-weight: 600; font-size: .8rem; color: var(--gray-600); white-space: nowrap; }
-    .semanas-table input[type="number"] {
-      width: 100%; padding: 7px 10px; border: 1.5px solid var(--gray-200);
-      border-radius: 7px; font-size: .875rem; color: var(--gray-800);
-      background: var(--gray-50); text-align: right;
-      appearance: textfield; -moz-appearance: textfield;
-      transition: border-color .15s, box-shadow .15s;
-    }
-    .semanas-table input[type="number"]::-webkit-outer-spin-button,
-    .semanas-table input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .semanas-table input:focus {
-      outline: none; border-color: var(--blue-400);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.12); background: var(--white);
-    }
-    .semanas-table input.linked-green { background: #f0fdf4; border-color: #86efac; }
-    .semanas-table input.linked-green:focus { border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.12); }
-    .semanas-table .totals-row td { background: var(--gray-50); font-weight: 700; border-top: 1.5px solid var(--gray-200); border-bottom: none; padding-top: 10px; padding-bottom: 10px; }
-    .semanas-table .totals-row .total-val { font-size: .95rem; color: var(--blue-900); text-align: right; font-variant-numeric: tabular-nums; }
+    .sem-label { font-size: .78rem; font-weight: 600; color: var(--gray-600); width: 80px; }
+    .semanas-table input[type="number"] { padding: 6px 10px; font-size: .82rem; }
 
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 20px;
-      font-size: .72rem;
-      color: var(--gray-400);
-      border-top: 1px solid var(--gray-200);
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid var(--gray-200); margin: 16px 0; }
+
+    /* ── Btn ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: .85rem; font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background .15s, box-shadow .15s;
     }
-    footer strong { color: var(--gray-600); }
+    .btn-primary { background: var(--blue-500); color: #fff; }
+    .btn-primary:hover { background: var(--blue-700); }
+    .btn-secondary {
+      background: var(--gray-100); color: var(--gray-700);
+      border: 1.5px solid var(--gray-200);
+    }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-success { background: var(--green-600); color: #fff; }
+    .btn-success:hover { background: #15803d; }
+    .btn-sm { padding: 7px 14px; font-size: .78rem; }
+    .btn-xs { padding: 4px 10px; font-size: .72rem; }
+
+    /* ── Results ── */
+    .result-steps { display: flex; flex-direction: column; gap: 0; }
+    .result-row {
+      display: flex; align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: .83rem;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { flex: 1; color: var(--gray-600); }
+    .result-formula { font-size: .72rem; color: var(--gray-400); margin-left: 8px; }
+    .result-value { font-weight: 700; color: var(--gray-800); min-width: 100px; text-align: right; }
+    .result-final {
+      background: var(--blue-50);
+      border: 2px solid var(--blue-100);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 12px;
+    }
+    .result-final-label { font-size: .88rem; font-weight: 600; color: var(--blue-700); }
+    .result-final-val { font-size: 1.8rem; font-weight: 800; color: var(--blue-600); }
+    .result-final-unit { font-size: .8rem; color: var(--blue-500); margin-left: 4px; }
+
+    /* ── Liquidación ── */
+    .liq-section { margin-bottom: 10px; }
+    .liq-section-title {
+      font-size: .72rem; font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .liq-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0;
+      font-size: .82rem;
+    }
+    .liq-row .liq-name { color: var(--gray-600); }
+    .liq-row .liq-amount { font-weight: 600; color: var(--gray-800); }
+    .liq-row .liq-amount.positive { color: var(--green-600); }
+    .liq-row .liq-amount.negative { color: var(--red-600); }
+    .liq-total {
+      display: flex; justify-content: space-between;
+      padding: 10px 0; margin-top: 8px;
+      border-top: 2px solid var(--gray-200);
+      font-weight: 700;
+    }
+    .liq-total .liq-name { color: var(--gray-800); }
+    .liq-liquido {
+      background: var(--green-50);
+      border: 2px solid var(--green-100);
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px;
+    }
+    .liq-liquido-label { font-size: .9rem; font-weight: 700; color: var(--green-600); }
+    .liq-liquido-val { font-size: 1.6rem; font-weight: 800; color: var(--green-600); }
+
+    /* ── Nomina tab ── */
+    .nomina-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .nomina-toolbar .toolbar-label {
+      font-size: .78rem; font-weight: 600; color: var(--gray-600);
+      margin-right: 4px;
+    }
+    .progress-wrap {
+      flex: 1; min-width: 160px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .progress-bar-bg {
+      flex: 1; height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green-600);
+      border-radius: 4px;
+      transition: width .3s;
+    }
+    .progress-pct { font-size: .75rem; font-weight: 700; color: var(--green-600); min-width: 35px; }
+    .nomina-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .nomina-table th {
+      background: var(--gray-50);
+      padding: 9px 12px;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .nomina-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    .nomina-table tr:hover td { background: var(--gray-50); }
+    .nomina-table input[type="number"] { width: 80px; padding: 5px 8px; font-size: .78rem; }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+    .status-listo   { background: var(--green-100); color: var(--green-600); }
+    .status-pendiente { background: var(--amber-50); color: var(--amber-600); }
+    .status-vacio   { background: var(--gray-100); color: var(--gray-500); }
+    .add-teacher-row { padding: 14px 20px; border-top: 1px solid var(--gray-200); display: flex; gap: 10px; }
+    .add-teacher-row input[type="text"] { flex: 1; }
+
+    /* ── Historial ── */
+    .historial-list { display: flex; flex-direction: column; gap: 0; }
+    .historial-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .12s;
+    }
+    .historial-item:last-child { border-bottom: none; }
+    .historial-item:hover { background: var(--gray-50); }
+    .hist-icon {
+      width: 34px; height: 34px;
+      background: var(--blue-50);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .hist-icon svg { width: 16px; height: 16px; stroke: var(--blue-500); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .hist-info { flex: 1; }
+    .hist-nombre { font-size: .85rem; font-weight: 600; color: var(--gray-800); }
+    .hist-meta   { font-size: .72rem; color: var(--gray-400); margin-top: 1px; }
+    .hist-result { font-size: .9rem; font-weight: 700; color: var(--blue-600); }
+    .hist-liquido { font-size: .75rem; color: var(--green-600); font-weight: 600; }
+    .hist-actions { display: flex; gap: 6px; }
+    .btn-icon {
+      width: 28px; height: 28px;
+      border: 1px solid var(--gray-200);
+      background: var(--white);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .12s;
+    }
+    .btn-icon:hover { background: var(--gray-100); }
+    .btn-icon svg { width: 14px; height: 14px; stroke: var(--gray-500); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .btn-icon.danger:hover { background: var(--red-50); }
+    .btn-icon.danger svg { stroke: var(--red-600); }
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+      color: var(--gray-400); font-size: .85rem;
+    }
+    .empty-state svg { width: 40px; height: 40px; stroke: var(--gray-300); fill: none; stroke-width: 1.5; stroke-linecap: round; margin: 0 auto 12px; display: block; }
+
+    /* ── Warning ── */
+    .warning-box {
+      background: var(--amber-50);
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: .78rem;
+      color: var(--amber-600);
+      display: none;
+    }
+    .warning-box.show { display: flex; gap: 8px; align-items: flex-start; }
+
+    /* ── Btn row ── */
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid.three { grid-template-columns: 1fr 1fr; }
+      header { padding: 12px 16px; }
+      main { padding: 0 12px; margin: 16px auto; }
+      .nav-tabs { padding: 0 12px; }
+      .nav-tab { padding: 10px 12px; font-size: .78rem; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-icon">
-    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" stroke-width="3"/><line x1="12" y1="14" x2="16" y2="14" stroke-width="1.5"/><line x1="8" y1="18" x2="8" y2="18" stroke-width="3"/><line x1="12" y1="18" x2="16" y2="18" stroke-width="1.5"/></svg>
-  </div>
-  <div>
-    <h1>Calculadora de Horas Trabajadas</h1>
-    <p>Conversión de horas de contrato a días efectivos trabajados</p>
-  </div>
-</header>
-
-<main>
-  <div class="card">
-    <div class="card-header">
-      <h2>Datos del período</h2>
+<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="4" x2="8" y2="9"/></svg>
     </div>
-    <div class="card-body">
-      <form id="calc-form" novalidate>
+    <h2>Calculadora HH</h2>
+    <p>Sistema de Remuneraciones Docentes</p>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="login-user" placeholder="usuario" autocomplete="username" />
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <div id="login-error">Usuario o contraseña incorrectos</div>
+    <button class="btn-login" onclick="doLogin()">Ingresar</button>
+    <p class="login-hint">Demo: admin / 1234 · rrhh / rrhh2026</p>
+  </div>
+</div>
 
-        <!-- ① Identificación (opcional) -->
-        <div class="section-label">Identificación (opcional)</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="nombre">Nombre del docente</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Nombre completo" />
-          </div>
-          <div class="field">
-            <label>Período</label>
-            <div style="display:flex;gap:8px;">
-              <select id="mes" name="mes" style="flex:1">
-                <option value="">Mes</option>
-                <option>Enero</option><option>Febrero</option><option>Marzo</option>
-                <option>Abril</option><option>Mayo</option><option>Junio</option>
-                <option>Julio</option><option>Agosto</option><option>Septiembre</option>
-                <option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+<!-- ═══════════════════ APP ═══════════════════ -->
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <div class="header-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="4" x2="8" y2="9"/></svg>
+    </div>
+    <div class="header-title">
+      <h1>Calculadora HH</h1>
+      <p>Sistema de Remuneraciones Docentes</p>
+    </div>
+    <div class="header-user">
+      <div class="user-avatar" id="user-avatar">A</div>
+      <span id="user-name-display">Admin</span>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </header>
+
+  <!-- Nav -->
+  <div class="nav-tabs">
+    <div class="nav-tab active" data-tab="calculadora" onclick="switchTab('calculadora')">📊 Calculadora</div>
+    <div class="nav-tab" data-tab="nomina" onclick="switchTab('nomina')">👥 Nómina</div>
+    <div class="nav-tab" data-tab="historial" onclick="switchTab('historial')">🕑 Historial</div>
+  </div>
+
+  <!-- ═══ TAB: CALCULADORA ═══ -->
+  <div class="tab-content active" id="tab-calculadora">
+    <main>
+
+      <!-- Identificación -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Identificación</h2>
+          <span class="badge badge-blue">Período</span>
+        </div>
+        <div class="card-body">
+          <div class="form-grid three">
+            <div class="form-group full" style="grid-column:span 1">
+              <label>Nombre del docente</label>
+              <input type="text" id="nombreDocente" placeholder="Nombre Apellido" />
+            </div>
+            <div class="form-group">
+              <label>Mes</label>
+              <select id="selMes">
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
               </select>
-              <select id="anio" name="anio" style="flex:1" id="anio"></select>
+            </div>
+            <div class="form-group">
+              <label>Año</label>
+              <select id="selAnio"></select>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- ② Contrato -->
-        <div class="section-label">Contrato</div>
-        <div class="grid-3">
-          <div class="field">
-            <label for="horasContrato">Horas de contrato</label>
-            <span class="hint">Horas semanales (máx. 43)</span>
-            <input type="number" id="horasContrato" name="horasContrato"
-                   min="1" max="43" step="1" placeholder="Ej: 36" required />
-            <span class="field-error" id="err-contrato">Valor entre 1 y 43.</span>
+      <!-- Contrato -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Contrato</h2>
+          <span class="badge badge-blue">Datos base</span>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Horas contrato / semana</label>
+              <input type="number" id="horasContrato" min="1" max="43" step="1" placeholder="Ej: 36" oninput="onContratoChange()" />
+              <span class="field-hint">Máx. 43 hrs (44 hrs se calculan por días)</span>
+            </div>
+            <div class="form-group">
+              <label>Días del mes</label>
+              <input type="number" id="diasMes" min="28" max="31" step="1" value="30" oninput="recalcular()" />
+              <span class="field-hint">Convención: 30 días</span>
+            </div>
+            <div class="form-group">
+              <label>Días laborales / semana</label>
+              <input type="number" id="diasLaborales" min="1" max="6" step="1" value="5" oninput="onContratoChange()" />
+            </div>
+            <div class="form-group">
+              <label>Semanas del mes</label>
+              <input type="number" id="semanasDelMes" min="1" max="6" step="1" value="4" oninput="onContratoChange()" />
+            </div>
           </div>
-          <div class="field">
-            <label for="diasLaborales">Días lab. por semana</label>
-            <span class="hint">Normalmente 5 (lun–vie)</span>
-            <input type="number" id="diasLaborales" name="diasLaborales"
-                   min="1" max="7" step="1" value="5" required />
-            <span class="field-error" id="err-diaslab">Valor entre 1 y 7.</span>
+          <div class="warning-box" id="warn-44" style="margin-top:12px">
+            <span>⚠️</span>
+            <span>Contrato de 44 hrs: se calcula directamente por días trabajados, no aplica esta herramienta.</span>
           </div>
-          <div class="field">
-            <label for="semanas">Semanas del período</label>
-            <span class="hint">Normalmente 4</span>
-            <input type="number" id="semanas" name="semanas"
-                   min="1" max="5" step="0.5" value="4" required />
-            <span class="field-error" id="err-semanas">Valor entre 1 y 5.</span>
+          <div class="info-pill" id="info-pill" style="margin-top:12px">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="info-pill-text">Complete los campos de contrato para ver el resumen.</span>
           </div>
-        </div>
-
-        <!-- live display -->
-        <div class="info-pill">
-          <div class="pill-item">
-            <span class="pill-label">Horas del período</span>
-            <span class="pill-value" id="pill-hm">—</span>
-          </div>
-          <div class="pill-item">
-            <span class="pill-label">Tasa diaria</span>
-            <span class="pill-value" id="pill-hd">—</span>
-          </div>
-        </div>
-
-        <div class="alert alert-warning" id="alert-44">
-          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          <span>Los contratos de <strong>44 horas</strong> corresponden al máximo legal y se calculan directamente por días.</span>
-        </div>
-
-        <!-- ③ Desglose semanal -->
-        <div class="section-label">Desglose de horas trabajadas</div>
-        <table class="semanas-table">
-          <thead>
-            <tr>
-              <th style="width:110px"></th>
-              <th>Hrs trabajadas</th>
-              <th>Hrs ausentes</th>
-            </tr>
-          </thead>
-          <tbody id="semanas-body">
-            <!-- generado por JS -->
-          </tbody>
-          <tfoot>
-            <tr class="totals-row">
-              <td class="sem-label">Total</td>
-              <td class="total-val" id="total-trabajadas">—</td>
-              <td class="total-val" id="total-ausencias">—</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div class="linked-hint" style="margin-top:6px">
-          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
-          Por fila: completá horas trabajadas o ausentes — la otra se calcula sola.
-        </div>
-
-        <!-- Totales ocultos que alimentan el cálculo -->
-        <input type="hidden" id="horasAusencia" name="horasAusencia" value="0" />
-        <input type="hidden" id="horasTrabajadas" name="horasTrabajadas" value="0" />
-        <span class="field-error" id="err-ausencia" style="display:none"></span>
-        <span class="field-error" id="err-trabajadas" style="display:none"></span>
-
-        <!-- ④ Configuración -->
-        <div class="section-label">Configuración del período</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="diasMes">Días del mes</label>
-            <input type="number" id="diasMes" name="diasMes"
-                   min="1" max="31" step="1" value="30" required />
-            <span class="field-error" id="err-diasmes">Valor entre 1 y 31.</span>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button type="submit">Calcular días trabajados</button>
-          <button type="reset">Limpiar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Results -->
-  <div class="card" id="results">
-    <div class="card-header">
-      <h2>Resultado</h2>
-      <span class="badge badge-teal" id="result-badge"></span>
-    </div>
-    <div class="card-body">
-      <div class="result-meta" id="result-meta" style="display:none"></div>
-
-      <table class="steps-table">
-        <thead>
-          <tr>
-            <th>Paso</th>
-            <th>Descripción</th>
-            <th>Fórmula</th>
-            <th style="text-align:right">Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="step-num">1</span></td>
-            <td>Horas del período</td>
-            <td class="formula" id="f1"></td>
-            <td class="val" id="v1"></td>
-          </tr>
-          <tr>
-            <td><span class="step-num">2</span></td>
-            <td>Horas de ausencia</td>
-            <td class="formula" id="f2"></td>
-            <td class="val" id="v2"></td>
-          </tr>
-          <tr>
-            <td><span class="step-num">3</span></td>
-            <td>Horas trabajadas</td>
-            <td class="formula" id="f3"></td>
-            <td class="val" id="v3"></td>
-          </tr>
-          <tr>
-            <td><span class="step-num">4</span></td>
-            <td>Porcentaje trabajado</td>
-            <td class="formula" id="f4"></td>
-            <td class="val" id="v4"></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="result-box">
-        <div>
-          <div class="r-label">Días efectivamente trabajados</div>
-          <div class="r-sub" id="result-formula"></div>
-        </div>
-        <div style="text-align:right">
-          <span class="r-value" id="result-days"></span>
-          <span class="r-unit"> días</span>
         </div>
       </div>
 
-      <div style="margin-top:16px;display:flex;justify-content:flex-end;">
-        <button type="button" id="btn-guardar" style="
-          background:var(--teal-600);color:#fff;border:none;
-          padding:10px 22px;border-radius:8px;font-size:.875rem;
-          font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;
-          transition:opacity .15s;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-          Guardar análisis
-        </button>
+      <!-- Desglose semanal -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Desglose semanal de horas</h2>
+          <span class="badge badge-blue">4 semanas</span>
+        </div>
+        <div class="card-body">
+          <table class="semanas-table">
+            <thead>
+              <tr>
+                <th>Semana</th>
+                <th>Hrs. trabajadas</th>
+                <th>Hrs. ausencia</th>
+              </tr>
+            </thead>
+            <tbody id="semanas-body"></tbody>
+          </table>
+          <!-- hidden totals -->
+          <input type="hidden" id="horasTrabajadas" />
+          <input type="hidden" id="horasAusencia" />
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Historial -->
-  <div class="card" id="card-historial" style="display:none">
-    <div class="card-header">
-      <h2>Historial de análisis</h2>
-      <button type="button" id="btn-limpiar-hist" style="
-        font-size:.72rem;font-weight:600;color:var(--red-600);
-        background:none;border:1px solid #fecaca;border-radius:6px;
-        padding:3px 10px;cursor:pointer;">
-        Limpiar todo
-      </button>
-    </div>
-    <div class="card-body" style="padding:0">
-      <table style="width:100%;border-collapse:collapse;font-size:.84rem">
-        <thead>
-          <tr style="background:var(--gray-50)">
-            <th style="padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Docente</th>
-            <th style="padding:9px 14px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Período</th>
-            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Hrs contrato</th>
-            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Hrs trabajadas</th>
-            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">%</th>
-            <th style="padding:9px 14px;text-align:right;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-400);border-bottom:1.5px solid var(--gray-200)">Días</th>
-            <th style="padding:9px 14px;border-bottom:1.5px solid var(--gray-200)"></th>
-          </tr>
-        </thead>
-        <tbody id="hist-body"></tbody>
-      </table>
-    </div>
-  </div>
-</main>
+      <!-- Resultados -->
+      <div class="card" id="card-result" style="display:none">
+        <div class="card-header">
+          <h2>Resultado del cálculo</h2>
+          <span class="badge badge-green">Calculado</span>
+        </div>
+        <div class="card-body">
+          <div class="result-steps">
+            <div class="result-row">
+              <span class="result-label">Horas contrato mensual</span>
+              <span class="result-formula" id="r-formula-1"></span>
+              <span class="result-value" id="r-horas-mensual">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Horas efectivamente trabajadas</span>
+              <span class="result-formula"></span>
+              <span class="result-value" id="r-horas-trab">—</span>
+            </div>
+            <div class="result-row">
+              <span class="result-label">Porcentaje trabajado</span>
+              <span class="result-formula"></span>
+              <span class="result-value" id="r-pct">—</span>
+            </div>
+          </div>
+          <div class="result-final">
+            <div>
+              <div class="result-final-label">Días trabajados</div>
+              <div style="font-size:.75rem;color:var(--blue-400);margin-top:2px" id="r-formula-dias"></div>
+            </div>
+            <div>
+              <span class="result-final-val" id="r-dias">—</span>
+              <span class="result-final-unit">días</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Liquidación de sueldo -->
+      <div class="card" id="card-liquidacion" style="display:none">
+        <div class="card-header">
+          <h2>Liquidación de sueldo</h2>
+          <span class="badge badge-green">Remuneración docente</span>
+        </div>
+        <div class="card-body">
+          <!-- Parámetros liquidación -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Valor hora ($ bruto/hora)</label>
+              <input type="number" id="valorHora" min="0" step="100" placeholder="Ej: 19716" oninput="calcularLiquidacion()" />
+              <span class="field-hint">RBMN 2025: ~$19.716/hr</span>
+            </div>
+            <div class="form-group">
+              <label>Bienios reconocidos (0–15)</label>
+              <input type="number" id="bienios" min="0" max="15" step="1" value="0" oninput="calcularLiquidacion()" />
+            </div>
+            <div class="form-group">
+              <label>Perfeccionamiento (%)</label>
+              <input type="number" id="perfeccionamiento" min="0" max="40" step="1" value="0" oninput="calcularLiquidacion()" />
+              <span class="field-hint">Máx 40%</span>
+            </div>
+            <div class="form-group">
+              <label>Tramo carrera docente</label>
+              <select id="tramoCd" onchange="calcularLiquidacion()">
+                <option value="acceso">Acceso</option>
+                <option value="inicial">Inicial</option>
+                <option value="temprano">Temprano</option>
+                <option value="avanzado">Avanzado</option>
+                <option value="experto1">Experto I</option>
+                <option value="experto2">Experto II</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Bonif. zona (%)</label>
+              <input type="number" id="bonifZona" min="0" max="100" step="1" value="0" oninput="calcularLiquidacion()" />
+            </div>
+            <div class="form-group">
+              <label>AVDI / SNED ($)</label>
+              <input type="number" id="avdiSned" min="0" step="1000" value="0" oninput="calcularLiquidacion()" />
+            </div>
+            <div class="form-group">
+              <label>AFP</label>
+              <select id="afpSel" onchange="calcularLiquidacion()">
+                <option value="0.1049">Uno (10.49%)</option>
+                <option value="0.1058">Model (10.58%)</option>
+                <option value="0.1099">Planvital (10.99%)</option>
+                <option value="0.1127">Hábitat (11.27%)</option>
+                <option value="0.1144">Capital (11.44%)</option>
+                <option value="0.1144">Cuprum (11.44%)</option>
+                <option value="0.1145" selected>Provida (11.45%)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Plan de salud</label>
+              <select id="saludPlan" onchange="calcularLiquidacion()">
+                <option value="fonasa">FONASA (7%)</option>
+                <option value="isapre">ISAPRE (7%)</option>
+              </select>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Detalle liquidación -->
+          <div id="liq-detalle" style="display:none">
+            <!-- Ingresos imponibles -->
+            <div class="liq-section">
+              <div class="liq-section-title">Ingresos Imponibles</div>
+              <div class="liq-row"><span class="liq-name">RBMN proporcional</span><span class="liq-amount positive" id="liq-rbmn">$0</span></div>
+              <div class="liq-row" id="liq-row-bienios"><span class="liq-name">Bienios (<span id="liq-bienios-pct">0</span>%)</span><span class="liq-amount positive" id="liq-bienios">$0</span></div>
+              <div class="liq-row" id="liq-row-perf"><span class="liq-name">Perfeccionamiento (<span id="liq-perf-pct">0</span>%)</span><span class="liq-amount positive" id="liq-perf">$0</span></div>
+              <div class="liq-row" id="liq-row-atdp"><span class="liq-name">ATDP (<span id="liq-tramo-label">Acceso</span>)</span><span class="liq-amount positive" id="liq-atdp">$0</span></div>
+              <div class="liq-row" id="liq-row-zona"><span class="liq-name">Bonificación zona (<span id="liq-zona-pct">0</span>%)</span><span class="liq-amount positive" id="liq-zona">$0</span></div>
+              <div class="liq-total"><span class="liq-name">Total imponible</span><span class="liq-amount" id="liq-total-imp">$0</span></div>
+            </div>
+            <!-- Ingresos no imponibles -->
+            <div class="liq-section">
+              <div class="liq-section-title">Ingresos No Imponibles</div>
+              <div class="liq-row" id="liq-row-avdi"><span class="liq-name">AVDI / SNED</span><span class="liq-amount positive" id="liq-avdi">$0</span></div>
+            </div>
+            <!-- Descuentos legales -->
+            <div class="liq-section">
+              <div class="liq-section-title">Descuentos Legales</div>
+              <div class="liq-row"><span class="liq-name">AFP (<span id="liq-afp-pct">11.45</span>%)</span><span class="liq-amount negative" id="liq-afp">$0</span></div>
+              <div class="liq-row"><span class="liq-name">Salud (7%)</span><span class="liq-amount negative" id="liq-salud">$0</span></div>
+              <div class="liq-row"><span class="liq-name">Seg. Cesantía (0.6%)</span><span class="liq-amount negative" id="liq-cesantia">$0</span></div>
+              <div class="liq-row"><span class="liq-name">IUSC</span><span class="liq-amount negative" id="liq-iusc">$0</span></div>
+              <div class="liq-total"><span class="liq-name">Total descuentos</span><span class="liq-amount negative" id="liq-total-desc">$0</span></div>
+            </div>
+            <!-- Líquido -->
+            <div class="liq-liquido">
+              <span class="liq-liquido-label">Líquido a pagar</span>
+              <span class="liq-liquido-val" id="liq-liquido">$0</span>
+            </div>
+          </div>
+
+          <div class="btn-row" style="margin-top:16px">
+            <button class="btn btn-success" onclick="guardarAnalisis()">💾 Guardar análisis</button>
+            <button class="btn btn-secondary" onclick="exportarCSVIndividual()">⬇ Exportar CSV</button>
+            <button class="btn btn-secondary" onclick="agregarANomina()">➕ Agregar a nómina</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /tab-calculadora -->
+
+  <!-- ═══ TAB: NÓMINA ═══ -->
+  <div class="tab-content" id="tab-nomina">
+    <main>
+      <div class="card">
+        <div class="card-header">
+          <h2>Nómina del período</h2>
+          <span class="badge badge-blue" id="nomina-periodo-badge">—</span>
+        </div>
+        <div class="nomina-toolbar">
+          <button class="btn btn-primary btn-sm" onclick="marcarSinAusencias()">✅ Sin ausencias</button>
+          <button class="btn btn-secondary btn-sm" onclick="exportarCSVNomina()">⬇ Exportar nómina CSV</button>
+          <button class="btn btn-secondary btn-sm" onclick="limpiarNominaCompleta()">🗑 Limpiar nómina</button>
+          <div class="progress-wrap">
+            <span class="toolbar-label">Completado:</span>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="nomina-progress-fill" style="width:0%"></div></div>
+            <span class="progress-pct" id="nomina-progress-pct">0%</span>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="nomina-table" id="nomina-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Hrs contrato</th>
+                <th>Días trabajados</th>
+                <th>Líquido ($)</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="nomina-tbody"></tbody>
+          </table>
+        </div>
+        <div class="add-teacher-row">
+          <input type="text" id="nuevo-docente-nombre" placeholder="Nombre del docente" />
+          <input type="number" id="nuevo-docente-hrs" min="1" max="43" placeholder="Hrs/sem" style="width:100px" />
+          <button class="btn btn-primary btn-sm" onclick="agregarDocente()">+ Agregar</button>
+        </div>
+      </div>
+    </main>
+  </div><!-- /tab-nomina -->
+
+  <!-- ═══ TAB: HISTORIAL ═══ -->
+  <div class="tab-content" id="tab-historial">
+    <main>
+      <div class="card">
+        <div class="card-header">
+          <h2>Historial de análisis</h2>
+          <button class="btn btn-secondary btn-xs" onclick="limpiarHistorial()">Limpiar todo</button>
+        </div>
+        <div id="historial-container">
+          <div class="empty-state" id="historial-empty">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            No hay análisis guardados aún.
+          </div>
+          <div class="historial-list" id="historial-list"></div>
+        </div>
+      </div>
+    </main>
+  </div><!-- /tab-historial -->
+
+</div><!-- /app -->
 
 <script>
-  // ── Poblar selector de año (2026 en adelante) ──
-  (function() {
-    const sel = document.getElementById('anio');
-    const cur = new Date().getFullYear();
-    const max = cur + 5;
-    for (let y = 2026; y <= max; y++) {
-      const opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      if (y === cur) opt.selected = true;
-      sel.appendChild(opt);
-    }
-  })();
+// ─────────────────────────────────────────────────
+// CONSTANTS
+// ─────────────────────────────────────────────────
+const USERS = {
+  admin: '1234',
+  rrhh: 'rrhh2026'
+};
+const NUM_SEMANAS = 4;
+const UTM_MENSUAL = 66638; // UTM 2026 aprox
 
-  const form           = document.getElementById('calc-form');
-  const resultsEl      = document.getElementById('results');
-  const alert44        = document.getElementById('alert-44');
-  const inpContrato    = document.getElementById('horasContrato');
-  const inpDiasLab     = document.getElementById('diasLaborales');
-  const inpSemanas     = document.getElementById('semanas');
-  const inpDiasAus     = document.getElementById('diasAusencia');
-  const inpHorasAus    = document.getElementById('horasAusencia');
-  const inpTrabajadas  = document.getElementById('horasTrabajadas');
-  const pillHM         = document.getElementById('pill-hm');
-  const pillHD         = document.getElementById('pill-hd');
+// ATDP valores mensuales base (contrato 44hrs), proporcionales por horas
+const ATDP_BASE_44 = {
+  acceso: 0,
+  inicial: 54000,
+  temprano: 144000,
+  avanzado: 244000,
+  experto1: 454000,
+  experto2: 834000
+};
 
-  function fmt(n, dec = 2) {
-    return Number(n.toFixed(dec)).toLocaleString('es-CL', {
-      minimumFractionDigits: dec,
-      maximumFractionDigits: dec
-    });
+// IUSC tramos 2025 (sobre renta imponible mensual en UTM)
+// [límite superior en UTM, tasa, rebaja en UTM]
+const IUSC_TRAMOS = [
+  [13.5,   0,      0     ],
+  [30,     0.04,   0.54  ],
+  [50,     0.08,   1.74  ],
+  [70,     0.135,  4.49  ],
+  [90,     0.23,   11.16 ],
+  [120,    0.304,  17.82 ],
+  [150,    0.355,  23.94 ],
+  [Infinity, 0.40, 31.44 ]
+];
+
+// ─────────────────────────────────────────────────
+// AUTH
+// ─────────────────────────────────────────────────
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  if (USERS[u] && USERS[u] === p) {
+    currentUser = u;
+    sessionStorage.setItem('hh_user', u);
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    document.getElementById('user-avatar').textContent = u[0].toUpperCase();
+    document.getElementById('user-name-display').textContent = u === 'admin' ? 'Admin' : 'RRHH';
+    document.getElementById('login-error').style.display = 'none';
+    initApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
   }
+}
 
-  function getBase() {
-    const c  = parseFloat(inpContrato.value);
-    const dl = parseFloat(inpDiasLab.value) || 5;
-    const s  = parseFloat(inpSemanas.value);
-    if (isNaN(c) || isNaN(s)) return null;
-    return { hm: c * s, hd: c / dl };
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('login-user').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('login-pass').focus();
+});
+
+function doLogout() {
+  sessionStorage.removeItem('hh_user');
+  currentUser = null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// Auto-login if session exists
+(function() {
+  const saved = sessionStorage.getItem('hh_user');
+  if (saved && USERS[saved] !== undefined) {
+    currentUser = saved;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    document.getElementById('user-avatar').textContent = saved[0].toUpperCase();
+    document.getElementById('user-name-display').textContent = saved === 'admin' ? 'Admin' : 'RRHH';
+    initApp();
   }
+})();
 
-  function updatePills() {
-    const b = getBase();
-    if (b) {
-      pillHM.textContent = fmt(b.hm, 1) + ' hrs';
-      pillHD.textContent = fmt(b.hd, 2) + ' hrs/día';
-    } else {
-      pillHM.textContent = '—';
-      pillHD.textContent = '—';
-    }
+// ─────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+  if (tab === 'historial') renderHistorial();
+  if (tab === 'nomina') renderNomina();
+}
+
+// ─────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────
+function initApp() {
+  // Populate year selector
+  const selAnio = document.getElementById('selAnio');
+  const curYear = new Date().getFullYear();
+  selAnio.innerHTML = '';
+  for (let y = curYear; y <= curYear + 5; y++) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    selAnio.appendChild(o);
   }
-
-  // ── Tabla semanal ──
-  const NUM_SEMANAS = 4;
-  const tbody = document.getElementById('semanas-body');
-  const hiddenAus  = document.getElementById('horasAusencia');
-  const hiddenTrab = document.getElementById('horasTrabajadas');
-
-  function buildSemanasTable() {
-    tbody.innerHTML = '';
-    for (let i = 1; i <= NUM_SEMANAS; i++) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td class="sem-label">Semana ${i}</td>
-        <td><input type="number" class="inp-trab" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>
-        <td><input type="number" class="inp-aus  linked-green" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>`;
-      tbody.appendChild(tr);
-    }
-    attachSemanasListeners();
-  }
-
-  function getContratoVal() { return parseFloat(inpContrato.value) || 0; }
-
-  function updateTotals() {
-    const trabInputs = tbody.querySelectorAll('.inp-trab');
-    const ausInputs  = tbody.querySelectorAll('.inp-aus');
-    let totalTrab = 0, totalAus = 0;
-    trabInputs.forEach(inp => { totalTrab += parseFloat(inp.value) || 0; });
-    ausInputs.forEach(inp  => { totalAus  += parseFloat(inp.value)  || 0; });
-    document.getElementById('total-trabajadas').textContent = fmt(totalTrab, 2) + ' hrs';
-    document.getElementById('total-ausencias').textContent  = fmt(totalAus,  2) + ' hrs';
-    hiddenTrab.value = parseFloat(totalTrab.toFixed(2));
-    hiddenAus.value  = parseFloat(totalAus.toFixed(2));
-  }
-
-  function attachSemanasListeners() {
-    tbody.querySelectorAll('.inp-trab').forEach(inp => {
-      inp.addEventListener('input', () => {
-        const contrato = getContratoVal();
-        const sem = inp.dataset.sem;
-        const ausInp = tbody.querySelector(`.inp-aus[data-sem="${sem}"]`);
-        const trab = parseFloat(inp.value);
-        if (!isNaN(trab) && contrato > 0) {
-          ausInp.value = parseFloat(Math.max(0, contrato - trab).toFixed(2));
-        }
-        updateTotals();
-      });
-    });
-    tbody.querySelectorAll('.inp-aus').forEach(inp => {
-      inp.addEventListener('input', () => {
-        const contrato = getContratoVal();
-        const sem = inp.dataset.sem;
-        const trabInp = tbody.querySelector(`.inp-trab[data-sem="${sem}"]`);
-        const aus = parseFloat(inp.value);
-        if (!isNaN(aus) && contrato > 0) {
-          trabInp.value = parseFloat(Math.max(0, contrato - aus).toFixed(2));
-        }
-        updateTotals();
-      });
-    });
-  }
-
-  // Recalcular ausencias cuando cambia el contrato (manteniendo trabajadas)
-  inpContrato.addEventListener('input', () => {
-    updatePills();
-    alert44.classList.toggle('visible', Number(inpContrato.value) === 44);
-    const contrato = getContratoVal();
-    tbody.querySelectorAll('.inp-trab').forEach(inp => {
-      const trab = parseFloat(inp.value);
-      if (!isNaN(trab) && contrato > 0) {
-        const sem = inp.dataset.sem;
-        const ausInp = tbody.querySelector(`.inp-aus[data-sem="${sem}"]`);
-        ausInp.value = parseFloat(Math.max(0, contrato - trab).toFixed(2));
-      }
-    });
-    updateTotals();
-  });
-
-  [inpDiasLab, inpSemanas].forEach(inp => {
-    inp.addEventListener('input', () => {
-      updatePills();
-    });
-  });
+  // Set current month
+  document.getElementById('selMes').value = new Date().getMonth() + 1;
 
   buildSemanasTable();
+  renderHistorial();
+  renderNomina();
+}
 
-  function clearErrors() {
-    document.querySelectorAll('.field-error').forEach(el => el.classList.remove('visible'));
-    document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
+// ─────────────────────────────────────────────────
+// CALCULADORA
+// ─────────────────────────────────────────────────
+function onContratoChange() {
+  const hc = parseFloat(document.getElementById('horasContrato').value) || 0;
+  const sem = parseInt(document.getElementById('semanasDelMes').value) || 4;
+  const dias = parseInt(document.getElementById('diasLaborales').value) || 5;
+
+  const warn44 = document.getElementById('warn-44');
+  if (hc === 44) { warn44.classList.add('show'); } else { warn44.classList.remove('show'); }
+
+  const horasDiarias = dias > 0 ? hc / dias : 0;
+  const horasMensuales = hc * sem;
+
+  const pill = document.getElementById('info-pill-text');
+  if (hc > 0) {
+    pill.textContent = `Contrato: ${hc} hrs/sem · ${horasDiarias.toFixed(2)} hrs/día · ${horasMensuales} hrs/mes`;
+  } else {
+    pill.textContent = 'Complete los campos de contrato para ver el resumen.';
   }
 
-  form.addEventListener('reset', () => {
-    resultsEl.classList.remove('visible');
-    alert44.classList.remove('visible');
-    clearErrors();
-    pillHM.textContent = '—';
-    pillHD.textContent = '—';
-    buildSemanasTable();
-    updateTotals();
+  // Update semanas table max
+  document.querySelectorAll('.inp-trab').forEach(inp => { inp.max = hc; });
+  document.querySelectorAll('.inp-aus').forEach(inp => { inp.max = hc; });
+
+  recalcular();
+}
+
+function buildSemanasTable() {
+  const tbody = document.getElementById('semanas-body');
+  tbody.innerHTML = '';
+  for (let i = 1; i <= NUM_SEMANAS; i++) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="sem-label">Semana ${i}</td>
+      <td><input type="number" class="inp-trab" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>
+      <td><input type="number" class="inp-aus linked-green" data-sem="${i}" min="0" step="0.5" placeholder="0" /></td>`;
+    tbody.appendChild(tr);
+  }
+  attachSemanasListeners();
+}
+
+function attachSemanasListeners() {
+  document.querySelectorAll('.inp-trab').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const s = this.dataset.sem;
+      const hc = parseFloat(document.getElementById('horasContrato').value) || 0;
+      const trab = parseFloat(this.value) || 0;
+      const aus = document.querySelector(`.inp-aus[data-sem="${s}"]`);
+      aus.value = parseFloat(Math.max(0, hc - trab).toFixed(2));
+      recalcular();
+    });
   });
-
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    clearErrors();
-
-    const contrato  = parseFloat(inpContrato.value);
-    const diasLab   = parseFloat(inpDiasLab.value);
-    const semanas   = parseFloat(inpSemanas.value);
-    const diasMes   = parseFloat(document.getElementById('diasMes').value);
-    const horasAus  = parseFloat(hiddenAus.value)  || 0;
-    const horasTrab = parseFloat(hiddenTrab.value) || 0;
-    const nombre    = document.getElementById('nombre').value.trim();
-    const mes       = document.getElementById('mes').value;
-    const anio      = document.getElementById('anio').value;
-    const periodo   = [mes, anio].filter(Boolean).join(' ');
-
-    let valid = true;
-    const hm = contrato * semanas;
-
-    if (isNaN(contrato) || contrato < 1 || contrato > 43) {
-      document.getElementById('err-contrato').classList.add('visible');
-      inpContrato.classList.add('error'); valid = false;
-    }
-    if (isNaN(diasLab) || diasLab < 1 || diasLab > 7) {
-      document.getElementById('err-diaslab').classList.add('visible');
-      inpDiasLab.classList.add('error'); valid = false;
-    }
-    if (isNaN(semanas) || semanas < 0.5 || semanas > 5) {
-      document.getElementById('err-semanas').classList.add('visible');
-      inpSemanas.classList.add('error'); valid = false;
-    }
-    if (isNaN(diasMes) || diasMes < 1 || diasMes > 31) {
-      document.getElementById('err-diasmes').classList.add('visible');
-      document.getElementById('diasMes').classList.add('error'); valid = false;
-    }
-    if (!valid) return;
-
-    const horasMensuales = hm;
-    const porcentaje     = horasMensuales > 0 ? (horasTrab / horasMensuales) * 100 : 0;
-    const diasTrabajados = diasMes * (porcentaje / 100);
-
-    const metaEl = document.getElementById('result-meta');
-    if (nombre || periodo) {
-      metaEl.style.display = 'block';
-      metaEl.innerHTML = [
-        nombre  ? `<strong>${nombre}</strong>` : '',
-        periodo ? `Período: <strong>${periodo}</strong>` : ''
-      ].filter(Boolean).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
-    } else {
-      metaEl.style.display = 'none';
-    }
-
-    document.getElementById('result-badge').textContent =
-      nombre || periodo ? (nombre || periodo) : 'Cálculo';
-
-    document.getElementById('f1').textContent = `${contrato} × ${semanas}`;
-    document.getElementById('v1').textContent = `${fmt(horasMensuales, 1)} hrs`;
-
-    document.getElementById('f2').textContent = 'desglose semanal';
-    document.getElementById('v2').textContent = `${fmt(horasAus, 2)} hrs`;
-
-    document.getElementById('f3').textContent = `${fmt(horasMensuales, 1)} − ${fmt(horasAus, 2)}`;
-    document.getElementById('v3').textContent = `${fmt(horasTrab, 2)} hrs`;
-
-    document.getElementById('f4').textContent = `(${fmt(horasTrab, 2)} ÷ ${fmt(horasMensuales, 1)}) × 100`;
-    document.getElementById('v4').textContent = `${fmt(porcentaje, 2)}%`;
-
-    document.getElementById('result-formula').textContent =
-      `${diasMes} días × ${fmt(porcentaje, 2)}%`;
-    document.getElementById('result-days').textContent = fmt(diasTrabajados, 2);
-
-    // Guardar último resultado para el botón guardar
-    form._lastResult = { nombre, periodo, contrato, semanas, horasAus, horasTrab, porcentaje, diasTrabajados };
-
-    resultsEl.classList.add('visible');
-    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.inp-aus').forEach(inp => {
+    inp.addEventListener('input', function() {
+      const s = this.dataset.sem;
+      const hc = parseFloat(document.getElementById('horasContrato').value) || 0;
+      const aus = parseFloat(this.value) || 0;
+      const trab = document.querySelector(`.inp-trab[data-sem="${s}"]`);
+      trab.value = parseFloat(Math.max(0, hc - aus).toFixed(2));
+      recalcular();
+    });
   });
+}
 
-  // ── Historial (localStorage) ──
-  const HIST_KEY = 'hh_historial';
+function recalcular() {
+  const hc   = parseFloat(document.getElementById('horasContrato').value) || 0;
+  const sem  = parseInt(document.getElementById('semanasDelMes').value)   || 4;
+  const dmes = parseInt(document.getElementById('diasMes').value)          || 30;
 
-  function getHistorial() {
-    try { return JSON.parse(localStorage.getItem(HIST_KEY)) || []; }
-    catch { return []; }
+  let totalTrab = 0, totalAus = 0;
+  for (let i = 1; i <= NUM_SEMANAS; i++) {
+    totalTrab += parseFloat(document.querySelector(`.inp-trab[data-sem="${i}"]`)?.value || 0);
+    totalAus  += parseFloat(document.querySelector(`.inp-aus[data-sem="${i}"]`)?.value  || 0);
   }
 
-  function saveHistorial(data) {
-    localStorage.setItem(HIST_KEY, JSON.stringify(data));
+  document.getElementById('horasTrabajadas').value = parseFloat(totalTrab.toFixed(2));
+  document.getElementById('horasAusencia').value   = parseFloat(totalAus.toFixed(2));
+
+  if (hc <= 0 || totalTrab <= 0 && totalAus <= 0) {
+    document.getElementById('card-result').style.display = 'none';
+    document.getElementById('card-liquidacion').style.display = 'none';
+    return;
   }
 
-  function renderHistorial() {
-    const hist = getHistorial();
-    const card = document.getElementById('card-historial');
-    const tbody = document.getElementById('hist-body');
-    if (!hist.length) { card.style.display = 'none'; return; }
-    card.style.display = 'block';
-    tbody.innerHTML = hist.map((r, i) => `
-      <tr style="border-bottom:1px solid var(--gray-100)">
-        <td style="padding:10px 14px;font-weight:600">${r.nombre || '<span style="color:var(--gray-400)">—</span>'}</td>
-        <td style="padding:10px 14px;color:var(--gray-600)">${r.periodo || '—'}</td>
-        <td style="padding:10px 14px;text-align:right;font-variant-numeric:tabular-nums">${fmt(r.contrato,0)} × ${fmt(r.semanas,0)}<br><span style="font-size:.72rem;color:var(--gray-400)">${fmt(r.contrato * r.semanas, 0)} hrs</span></td>
-        <td style="padding:10px 14px;text-align:right;font-variant-numeric:tabular-nums">${fmt(r.horasTrab,2)} hrs</td>
-        <td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--blue-700)">${fmt(r.porcentaje,1)}%</td>
-        <td style="padding:10px 14px;text-align:right;font-weight:800;font-size:1rem;color:var(--blue-900)">${fmt(r.diasTrabajados,2)}</td>
-        <td style="padding:10px 14px;text-align:center">
-          <button onclick="eliminarEntrada(${i})" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:1rem" title="Eliminar">✕</button>
-        </td>
-      </tr>`).join('');
+  const horasMensuales = hc * sem;
+  const porcentaje     = Math.min(100, (totalTrab / horasMensuales) * 100);
+  const diasTrabajados = dmes * (porcentaje / 100);
+
+  document.getElementById('r-formula-1').textContent = `${hc} × ${sem} sem`;
+  document.getElementById('r-horas-mensual').textContent = `${horasMensuales} hrs`;
+  document.getElementById('r-horas-trab').textContent    = `${totalTrab.toFixed(2)} hrs`;
+  document.getElementById('r-pct').textContent           = `${porcentaje.toFixed(2)}%`;
+  document.getElementById('r-formula-dias').textContent  = `${dmes} días × ${porcentaje.toFixed(2)}%`;
+  document.getElementById('r-dias').textContent          = diasTrabajados.toFixed(2);
+
+  document.getElementById('card-result').style.display = 'block';
+  document.getElementById('card-liquidacion').style.display = 'block';
+  calcularLiquidacion();
+}
+
+// ─────────────────────────────────────────────────
+// LIQUIDACIÓN
+// ─────────────────────────────────────────────────
+function calcularLiquidacion() {
+  const valorHora     = parseFloat(document.getElementById('valorHora').value)         || 0;
+  const hc            = parseFloat(document.getElementById('horasContrato').value)      || 0;
+  const sem           = parseInt(document.getElementById('semanasDelMes').value)        || 4;
+  const bienios       = parseInt(document.getElementById('bienios').value)              || 0;
+  const perfPct       = parseFloat(document.getElementById('perfeccionamiento').value)  || 0;
+  const tramo         = document.getElementById('tramoCd').value;
+  const zonaPct       = parseFloat(document.getElementById('bonifZona').value)         || 0;
+  const avdiSned      = parseFloat(document.getElementById('avdiSned').value)           || 0;
+  const afpRate       = parseFloat(document.getElementById('afpSel').value)             || 0.1145;
+
+  if (valorHora <= 0 || hc <= 0) {
+    document.getElementById('liq-detalle').style.display = 'none';
+    return;
   }
 
-  window.eliminarEntrada = function(i) {
-    const hist = getHistorial();
-    hist.splice(i, 1);
-    saveHistorial(hist);
-    renderHistorial();
+  const horasTrab = parseFloat(document.getElementById('horasTrabajadas').value) || 0;
+  const horasMensuales = hc * sem;
+  const porcentaje = horasMensuales > 0 ? Math.min(1, horasTrab / horasMensuales) : 1;
+
+  // RBMN completo (mensual)
+  const rbmnCompleto = hc * valorHora * (sem === 4 ? 4.333 : sem);
+  // RBMN proporcional al % trabajado
+  const rbmnProp = rbmnCompleto * porcentaje;
+
+  // Bienios: 1.69% cada uno sobre RBMN completo (proporcional al % trabajado)
+  const bieniosPct = bienios * 1.69;
+  const bienosAmt  = rbmnProp * (bieniosPct / 100);
+
+  // Perfeccionamiento sobre RBMN proporcional
+  const perfAmt = rbmnProp * (Math.min(40, perfPct) / 100);
+
+  // ATDP: proporcional a horas contrato / 44
+  const atdpBase = ATDP_BASE_44[tramo] || 0;
+  const atdpAmt  = atdpBase * (hc / 44) * porcentaje;
+
+  // Zona
+  const zonaAmt = rbmnProp * (zonaPct / 100);
+
+  const totalImponible = rbmnProp + bienosAmt + perfAmt + atdpAmt + zonaAmt;
+
+  // Descuentos sobre total imponible
+  const afpAmt      = totalImponible * afpRate;
+  const saludAmt    = totalImponible * 0.07;
+  const cesantiaAmt = totalImponible * 0.006;
+
+  // IUSC sobre base imponible − AFP − Salud
+  const baseIUSC = Math.max(0, totalImponible - afpAmt - saludAmt);
+  const iuscAmt  = calcularIUSC(baseIUSC);
+
+  const totalDesc = afpAmt + saludAmt + cesantiaAmt + iuscAmt;
+  const liquido   = totalImponible + avdiSned - totalDesc;
+
+  // Render
+  const fmt = v => '$' + Math.round(v).toLocaleString('es-CL');
+  document.getElementById('liq-rbmn').textContent         = fmt(rbmnProp);
+  document.getElementById('liq-bienios-pct').textContent  = bieniosPct.toFixed(2);
+  document.getElementById('liq-bienios').textContent      = fmt(bienosAmt);
+  document.getElementById('liq-perf-pct').textContent     = Math.min(40, perfPct);
+  document.getElementById('liq-perf').textContent         = fmt(perfAmt);
+  document.getElementById('liq-tramo-label').textContent  = tramo.charAt(0).toUpperCase() + tramo.slice(1).replace('1',' I').replace('2',' II');
+  document.getElementById('liq-atdp').textContent         = fmt(atdpAmt);
+  document.getElementById('liq-zona-pct').textContent     = zonaPct;
+  document.getElementById('liq-zona').textContent         = fmt(zonaAmt);
+  document.getElementById('liq-total-imp').textContent    = fmt(totalImponible);
+  document.getElementById('liq-avdi').textContent         = fmt(avdiSned);
+  document.getElementById('liq-afp-pct').textContent      = (afpRate * 100).toFixed(2);
+  document.getElementById('liq-afp').textContent          = '-' + fmt(afpAmt);
+  document.getElementById('liq-salud').textContent        = '-' + fmt(saludAmt);
+  document.getElementById('liq-cesantia').textContent     = '-' + fmt(cesantiaAmt);
+  document.getElementById('liq-iusc').textContent         = '-' + fmt(iuscAmt);
+  document.getElementById('liq-total-desc').textContent   = '-' + fmt(totalDesc);
+  document.getElementById('liq-liquido').textContent      = fmt(liquido);
+
+  // Show/hide rows
+  document.getElementById('liq-row-bienios').style.display = bienios > 0   ? '' : 'none';
+  document.getElementById('liq-row-perf').style.display    = perfPct > 0   ? '' : 'none';
+  document.getElementById('liq-row-atdp').style.display    = atdpAmt > 0   ? '' : 'none';
+  document.getElementById('liq-row-zona').style.display    = zonaPct > 0   ? '' : 'none';
+  document.getElementById('liq-row-avdi').style.display    = avdiSned > 0  ? '' : 'none';
+
+  document.getElementById('liq-detalle').style.display = 'block';
+
+  // Store for save
+  window._liqData = { rbmnProp, bienosAmt, perfAmt, atdpAmt, zonaAmt, totalImponible, avdiSned, afpAmt, saludAmt, cesantiaAmt, iuscAmt, totalDesc, liquido };
+}
+
+function calcularIUSC(baseIUSC) {
+  const enUTM = baseIUSC / UTM_MENSUAL;
+  for (const [limite, tasa, rebaja] of IUSC_TRAMOS) {
+    if (enUTM <= limite) {
+      return Math.max(0, enUTM * tasa * UTM_MENSUAL - rebaja * UTM_MENSUAL);
+    }
+  }
+  return 0;
+}
+
+// ─────────────────────────────────────────────────
+// GUARDAR / HISTORIAL
+// ─────────────────────────────────────────────────
+function guardarAnalisis() {
+  const nombre = document.getElementById('nombreDocente').value.trim() || 'Sin nombre';
+  const mes    = document.getElementById('selMes').value;
+  const anio   = document.getElementById('selAnio').value;
+  const diasTrab = document.getElementById('r-dias').textContent;
+  const liquido  = window._liqData ? window._liqData.liquido : null;
+
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  const entry = {
+    id: Date.now(),
+    nombre,
+    periodo: `${meses[mes-1]} ${anio}`,
+    diasTrabajados: diasTrab,
+    liquido,
+    horasContrato: document.getElementById('horasContrato').value,
+    porcentaje: document.getElementById('r-pct').textContent,
+    timestamp: new Date().toLocaleDateString('es-CL')
   };
 
-  document.getElementById('btn-guardar').addEventListener('click', () => {
-    const r = form._lastResult;
-    if (!r) return;
-    const hist = getHistorial();
-    hist.unshift({ ...r, savedAt: new Date().toISOString() });
-    saveHistorial(hist);
-    renderHistorial();
-    const btn = document.getElementById('btn-guardar');
-    btn.textContent = '✓ Guardado';
-    btn.style.opacity = '.7';
-    setTimeout(() => { btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar análisis'; btn.style.opacity = '1'; }, 2000);
-  });
-
-  document.getElementById('btn-limpiar-hist').addEventListener('click', () => {
-    if (!confirm('¿Eliminar todo el historial?')) return;
-    saveHistorial([]);
-    renderHistorial();
-  });
-
-  // Cargar historial al iniciar
+  const hist = getHistorial();
+  hist.unshift(entry);
+  localStorage.setItem('hh_historial', JSON.stringify(hist));
   renderHistorial();
+  alert(`✅ Análisis de ${nombre} guardado.`);
+}
+
+function getHistorial() {
+  try { return JSON.parse(localStorage.getItem('hh_historial') || '[]'); } catch { return []; }
+}
+
+function renderHistorial() {
+  const hist = getHistorial();
+  const list = document.getElementById('historial-list');
+  const empty = document.getElementById('historial-empty');
+  if (!hist.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  list.innerHTML = hist.map(e => `
+    <div class="historial-item">
+      <div class="hist-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div class="hist-info">
+        <div class="hist-nombre">${e.nombre}</div>
+        <div class="hist-meta">${e.periodo} · Guardado: ${e.timestamp} · ${e.horasContrato} hrs/sem · ${e.porcentaje}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="hist-result">${e.diasTrabajados} días</div>
+        ${e.liquido ? `<div class="hist-liquido">${'$' + Math.round(e.liquido).toLocaleString('es-CL')}</div>` : ''}
+      </div>
+      <div class="hist-actions">
+        <button class="btn-icon danger" onclick="eliminarHistorial(${e.id})" title="Eliminar">
+          <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/></svg>
+        </button>
+      </div>
+    </div>`).join('');
+}
+
+function eliminarHistorial(id) {
+  const hist = getHistorial().filter(e => e.id !== id);
+  localStorage.setItem('hh_historial', JSON.stringify(hist));
+  renderHistorial();
+}
+
+function limpiarHistorial() {
+  if (!confirm('¿Eliminar todo el historial?')) return;
+  localStorage.removeItem('hh_historial');
+  renderHistorial();
+}
+
+// ─────────────────────────────────────────────────
+// NÓMINA
+// ─────────────────────────────────────────────────
+function getNomina() {
+  try { return JSON.parse(localStorage.getItem('hh_nomina') || '[]'); } catch { return []; }
+}
+function saveNomina(n) { localStorage.setItem('hh_nomina', JSON.stringify(n)); }
+
+function getPeriodoBadge() {
+  const mes = document.getElementById('selMes').value;
+  const anio = document.getElementById('selAnio').value;
+  const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return `${meses[mes-1]} ${anio}`;
+}
+
+function renderNomina() {
+  const nomina = getNomina();
+  document.getElementById('nomina-periodo-badge').textContent = getPeriodoBadge();
+  const tbody = document.getElementById('nomina-tbody');
+  if (!nomina.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--gray-400);font-size:.82rem">No hay docentes en la nómina. Agrega desde la calculadora o con el formulario de abajo.</td></tr>';
+    updateNominaProgress(nomina);
+    return;
+  }
+  tbody.innerHTML = nomina.map((d, i) => {
+    const status = d.diasTrabajados !== null ? 'listo' : (d.nombre ? 'pendiente' : 'vacio');
+    const statusLabel = { listo: 'Listo', pendiente: 'Pendiente', vacio: '—' };
+    const statusClass = { listo: 'status-listo', pendiente: 'status-pendiente', vacio: 'status-vacio' };
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${d.nombre}</strong></td>
+      <td>${d.horasContrato || '—'}</td>
+      <td>${d.diasTrabajados !== null && d.diasTrabajados !== undefined ? d.diasTrabajados : '—'}</td>
+      <td>${d.liquido ? '$' + Math.round(d.liquido).toLocaleString('es-CL') : '—'}</td>
+      <td><span class="status-pill ${statusClass[status]}">${statusLabel[status]}</span></td>
+      <td>
+        <button class="btn btn-secondary btn-xs" onclick="eliminarDeNomina(${i})">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+  updateNominaProgress(nomina);
+}
+
+function updateNominaProgress(nomina) {
+  const total = nomina.length;
+  const listos = nomina.filter(d => d.diasTrabajados !== null && d.diasTrabajados !== undefined).length;
+  const pct = total > 0 ? Math.round((listos / total) * 100) : 0;
+  document.getElementById('nomina-progress-fill').style.width = pct + '%';
+  document.getElementById('nomina-progress-pct').textContent  = pct + '%';
+}
+
+function agregarANomina() {
+  const nombre = document.getElementById('nombreDocente').value.trim() || 'Sin nombre';
+  const hc     = document.getElementById('horasContrato').value;
+  const dias   = document.getElementById('r-dias').textContent;
+  const liquido = window._liqData ? window._liqData.liquido : null;
+
+  const nomina = getNomina();
+  nomina.push({ nombre, horasContrato: hc, diasTrabajados: dias !== '—' ? parseFloat(dias) : null, liquido });
+  saveNomina(nomina);
+  renderNomina();
+  alert(`✅ ${nombre} agregado a la nómina.`);
+}
+
+function agregarDocente() {
+  const nombre = document.getElementById('nuevo-docente-nombre').value.trim();
+  const hrs    = document.getElementById('nuevo-docente-hrs').value;
+  if (!nombre) { alert('Ingresa el nombre del docente.'); return; }
+  const nomina = getNomina();
+  nomina.push({ nombre, horasContrato: hrs || null, diasTrabajados: null, liquido: null });
+  saveNomina(nomina);
+  document.getElementById('nuevo-docente-nombre').value = '';
+  document.getElementById('nuevo-docente-hrs').value = '';
+  renderNomina();
+}
+
+function eliminarDeNomina(idx) {
+  const nomina = getNomina();
+  nomina.splice(idx, 1);
+  saveNomina(nomina);
+  renderNomina();
+}
+
+function marcarSinAusencias() {
+  const nomina = getNomina();
+  const sem  = parseInt(document.getElementById('semanasDelMes').value)  || 4;
+  const dmes = parseInt(document.getElementById('diasMes').value)         || 30;
+
+  let count = 0;
+  nomina.forEach(d => {
+    if (d.diasTrabajados === null || d.diasTrabajados === undefined) {
+      d.diasTrabajados = dmes; // 100% trabajado = días del mes completos
+      count++;
+    }
+  });
+  saveNomina(nomina);
+  renderNomina();
+  alert(`✅ ${count} docente(s) marcado(s) como sin ausencias (${dmes} días).`);
+}
+
+function limpiarNominaCompleta() {
+  if (!confirm('¿Limpiar toda la nómina?')) return;
+  localStorage.removeItem('hh_nomina');
+  renderNomina();
+}
+
+// ─────────────────────────────────────────────────
+// CSV EXPORT
+// ─────────────────────────────────────────────────
+function exportarCSVIndividual() {
+  const nombre = document.getElementById('nombreDocente').value.trim() || 'docente';
+  const mes    = document.getElementById('selMes').value;
+  const anio   = document.getElementById('selAnio').value;
+  const meses  = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const periodo = `${meses[mes-1]} ${anio}`;
+
+  const liq = window._liqData;
+  const rows = [
+    ['Campo', 'Valor'],
+    ['Nombre', nombre],
+    ['Período', periodo],
+    ['Horas contrato (sem)', document.getElementById('horasContrato').value],
+    ['Horas trabajadas', document.getElementById('horasTrabajadas').value],
+    ['% Trabajado', document.getElementById('r-pct').textContent],
+    ['Días trabajados', document.getElementById('r-dias').textContent],
+  ];
+  if (liq) {
+    const fmt = v => Math.round(v);
+    rows.push(
+      ['RBMN proporcional', fmt(liq.rbmnProp)],
+      ['Bienios', fmt(liq.bienosAmt)],
+      ['Perfeccionamiento', fmt(liq.perfAmt)],
+      ['ATDP', fmt(liq.atdpAmt)],
+      ['Bonif. Zona', fmt(liq.zonaAmt)],
+      ['AVDI/SNED', fmt(liq.avdiSned)],
+      ['Total imponible', fmt(liq.totalImponible)],
+      ['AFP', fmt(liq.afpAmt)],
+      ['Salud', fmt(liq.saludAmt)],
+      ['Cesantía', fmt(liq.cesantiaAmt)],
+      ['IUSC', fmt(liq.iuscAmt)],
+      ['Total descuentos', fmt(liq.totalDesc)],
+      ['Líquido a pagar', fmt(liq.liquido)]
+    );
+  }
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  downloadCSV(csv, `liquidacion_${nombre.replace(/\s+/g,'_')}_${periodo.replace(/\s+/g,'_')}.csv`);
+}
+
+function exportarCSVNomina() {
+  const nomina = getNomina();
+  if (!nomina.length) { alert('La nómina está vacía.'); return; }
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const periodo = `${meses[document.getElementById('selMes').value - 1]} ${document.getElementById('selAnio').value}`;
+  const rows = [
+    ['Nombre', 'Hrs Contrato', 'Días Trabajados', 'Líquido ($)', 'Estado'],
+    ...nomina.map(d => [
+      d.nombre,
+      d.horasContrato || '',
+      d.diasTrabajados !== null && d.diasTrabajados !== undefined ? d.diasTrabajados : '',
+      d.liquido ? Math.round(d.liquido) : '',
+      d.diasTrabajados !== null && d.diasTrabajados !== undefined ? 'Listo' : 'Pendiente'
+    ])
+  ];
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  downloadCSV(csv, `nomina_${periodo.replace(/\s+/g,'_')}.csv`);
+}
+
+function downloadCSV(csv, filename) {
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
