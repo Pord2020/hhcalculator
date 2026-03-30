@@ -286,11 +286,11 @@
           </div>
 
           <div class="field">
-            <label for="horasAsignadas">Horas asignadas</label>
-            <span class="hint">Horas del docente en el período</span>
-            <input type="number" id="horasAsignadas" name="horasAsignadas"
-                   min="1" step="0.5" placeholder="Ej: 30" required />
-            <span class="field-error" id="err-asignadas">Ingrese un valor mayor a 0.</span>
+            <label for="diasMes">Días del mes</label>
+            <span class="hint">Convención laboral (normalmente 30)</span>
+            <input type="number" id="diasMes" name="diasMes"
+                   min="1" max="31" step="1" value="30" required />
+            <span class="field-error" id="err-asignadas">Ingrese un valor entre 1 y 31.</span>
           </div>
 
           <div class="field">
@@ -424,7 +424,7 @@
 
     const contrato  = parseFloat(form.horasContrato.value);
     const semanas   = parseFloat(form.semanas.value);
-    const asignadas = parseFloat(form.horasAsignadas.value);
+    const diasMes   = parseFloat(form.diasMes.value);
     const ausencia  = parseFloat(form.diasAusencia.value);
 
     let valid = true;
@@ -440,9 +440,9 @@
       form.semanas.classList.add('error');
       valid = false;
     }
-    if (isNaN(asignadas) || asignadas <= 0) {
+    if (isNaN(diasMes) || diasMes < 1 || diasMes > 31) {
       document.getElementById('err-asignadas').classList.add('visible');
-      form.horasAsignadas.classList.add('error');
+      form.diasMes.classList.add('error');
       valid = false;
     }
     if (isNaN(ausencia) || ausencia < 0 || ausencia > diasHabilesMes) {
@@ -458,7 +458,7 @@
     const horasAusencia  = ausencia * horasDiarias;
     const horasEfectivas = horasMensuales - horasAusencia;
     const porcentaje     = (horasEfectivas / horasMensuales) * 100;
-    const diasTrabajados = asignadas * (porcentaje / 100);
+    const diasTrabajados = diasMes * (porcentaje / 100);
 
     // ── Fill steps ──
     document.getElementById('f1').textContent = `${contrato} × ${semanas}`;
@@ -477,7 +477,7 @@
     document.getElementById('v5').textContent = `${fmt(porcentaje, 2)}%`;
 
     document.getElementById('result-formula').textContent =
-      `${asignadas} hrs × ${fmt(porcentaje, 2)}%`;
+      `${diasMes} días × ${fmt(porcentaje, 2)}%`;
     document.getElementById('result-days').textContent = fmt(diasTrabajados, 2);
 
     results.classList.add('visible');
