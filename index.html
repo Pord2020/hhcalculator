@@ -294,11 +294,11 @@
           </div>
 
           <div class="field">
-            <label for="diasAusencia">Días de ausencia</label>
-            <span class="hint">Licencia médica, permisos, etc.</span>
-            <input type="number" id="diasAusencia" name="diasAusencia"
+            <label for="horasAusencia">Horas de ausencia</label>
+            <span class="hint">Total de horas no trabajadas en el período</span>
+            <input type="number" id="horasAusencia" name="horasAusencia"
                    min="0" step="0.5" value="0" required />
-            <span class="field-error" id="err-ausencia">No puede superar los días hábiles del mes.</span>
+            <span class="field-error" id="err-ausencia">No puede superar las horas mensuales del contrato.</span>
           </div>
 
         </div>
@@ -341,27 +341,21 @@
           </tr>
           <tr>
             <td><span class="step-num">2</span></td>
-            <td>Horas diarias de contrato</td>
+            <td>Horas de ausencia</td>
             <td class="formula"><span id="f2"></span></td>
             <td class="value" style="text-align:right" id="v2"></td>
           </tr>
           <tr>
             <td><span class="step-num">3</span></td>
-            <td>Horas de ausencia</td>
+            <td>Horas efectivamente trabajadas</td>
             <td class="formula"><span id="f3"></span></td>
             <td class="value" style="text-align:right" id="v3"></td>
           </tr>
           <tr>
             <td><span class="step-num">4</span></td>
-            <td>Horas efectivamente trabajadas</td>
+            <td>Porcentaje trabajado</td>
             <td class="formula"><span id="f4"></span></td>
             <td class="value" style="text-align:right" id="v4"></td>
-          </tr>
-          <tr>
-            <td><span class="step-num">5</span></td>
-            <td>Porcentaje trabajado</td>
-            <td class="formula"><span id="f5"></span></td>
-            <td class="value" style="text-align:right" id="v5"></td>
           </tr>
         </tbody>
       </table>
@@ -422,13 +416,12 @@
     e.preventDefault();
     clearErrors();
 
-    const contrato  = parseFloat(form.horasContrato.value);
-    const semanas   = parseFloat(form.semanas.value);
-    const diasMes   = parseFloat(form.diasMes.value);
-    const ausencia  = parseFloat(form.diasAusencia.value);
+    const contrato     = parseFloat(form.horasContrato.value);
+    const semanas      = parseFloat(form.semanas.value);
+    const diasMes      = parseFloat(form.diasMes.value);
+    const horasAusencia = parseFloat(form.horasAusencia.value);
 
     let valid = true;
-    const diasHabilesMes = semanas * 5;
 
     if (isNaN(contrato) || contrato < 1 || contrato > 43) {
       document.getElementById('err-contrato').classList.add('visible');
@@ -445,17 +438,16 @@
       form.diasMes.classList.add('error');
       valid = false;
     }
-    if (isNaN(ausencia) || ausencia < 0 || ausencia > diasHabilesMes) {
+    const horasMensualesCheck = contrato * semanas;
+    if (isNaN(horasAusencia) || horasAusencia < 0 || horasAusencia > horasMensualesCheck) {
       document.getElementById('err-ausencia').classList.add('visible');
-      form.diasAusencia.classList.add('error');
+      form.horasAusencia.classList.add('error');
       valid = false;
     }
     if (!valid) return;
 
     // ── Calculation ──
     const horasMensuales = contrato * semanas;
-    const horasDiarias   = contrato / 5;
-    const horasAusencia  = ausencia * horasDiarias;
     const horasEfectivas = horasMensuales - horasAusencia;
     const porcentaje     = (horasEfectivas / horasMensuales) * 100;
     const diasTrabajados = diasMes * (porcentaje / 100);
@@ -464,17 +456,14 @@
     document.getElementById('f1').textContent = `${contrato} × ${semanas}`;
     document.getElementById('v1').textContent = `${fmt(horasMensuales, 0)} hrs`;
 
-    document.getElementById('f2').textContent = `${contrato} ÷ 5`;
-    document.getElementById('v2').textContent = `${fmt(horasDiarias, 2)} hrs/día`;
+    document.getElementById('f2').textContent = `ingreso directo`;
+    document.getElementById('v2').textContent = `${fmt(horasAusencia, 2)} hrs`;
 
-    document.getElementById('f3').textContent = `${ausencia} × ${fmt(horasDiarias, 2)}`;
-    document.getElementById('v3').textContent = `${fmt(horasAusencia, 2)} hrs`;
+    document.getElementById('f3').textContent = `${fmt(horasMensuales, 0)} − ${fmt(horasAusencia, 2)}`;
+    document.getElementById('v3').textContent = `${fmt(horasEfectivas, 2)} hrs`;
 
-    document.getElementById('f4').textContent = `${fmt(horasMensuales, 0)} − ${fmt(horasAusencia, 2)}`;
-    document.getElementById('v4').textContent = `${fmt(horasEfectivas, 2)} hrs`;
-
-    document.getElementById('f5').textContent = `(${fmt(horasEfectivas, 2)} ÷ ${fmt(horasMensuales, 0)}) × 100`;
-    document.getElementById('v5').textContent = `${fmt(porcentaje, 2)}%`;
+    document.getElementById('f4').textContent = `(${fmt(horasEfectivas, 2)} ÷ ${fmt(horasMensuales, 0)}) × 100`;
+    document.getElementById('v4').textContent = `${fmt(porcentaje, 2)}%`;
 
     document.getElementById('result-formula').textContent =
       `${diasMes} días × ${fmt(porcentaje, 2)}%`;
